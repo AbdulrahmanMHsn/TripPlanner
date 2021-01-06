@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Trip Planner</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="TripPlanner">Trip Planner</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="donot_hava_account">Do not have already account ?</string>
+    <string name="signup">Sign up</string>
+    <string name="email_address">email address</string>
+    <string name="or_login_with">OR login with</string>
+    <string name="login_with_google">Google</string>
+    <string name="sign_up">Sign Up</string>
 </resources>
