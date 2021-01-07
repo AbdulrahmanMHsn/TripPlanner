@@ -12,4 +12,11 @@
     <string name="or_login_with">OR login with</string>
     <string name="login_with_google">Google</string>
     <string name="sign_up">Sign Up</string>
+    <string name="trip_details">Trip Details</string>
+    <string name="trip_name">Trip Name</string>
+    <string name="start_point">Start Point</string>
+    <string name="end_point">End Point</string>
+    <string name="date">Date</string>
+    <string name="status">Status Trip</string>
+    <string name="note">Note</string>
 </resources>

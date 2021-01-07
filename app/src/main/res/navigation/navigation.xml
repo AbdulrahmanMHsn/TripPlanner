@@ -13,10 +13,17 @@
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_tripDetailsFragment"
+            app:destination="@id/tripDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="amo.tripplanner.login.SignUpFragment"
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" />
+    <fragment
+        android:id="@+id/tripDetailsFragment"
+        android:name="amo.tripplanner.trips.TripDetailsFragment"
+        android:label="TripDetailsFragment" />
 </navigation>
