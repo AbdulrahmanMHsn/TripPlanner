@@ -2,65 +2,92 @@ package amo.tripplanner.login;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 import amo.tripplanner.R;
+import amo.tripplanner.databinding.FragmentSignUpBinding;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SignUpFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SignUpFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+    FragmentSignUpBinding binding;
+    private FirebaseAuth auth;
     public SignUpFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SignUpFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SignUpFragment newInstance(String param1, String param2) {
-        SignUpFragment fragment = new SignUpFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        auth = FirebaseAuth.getInstance();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sign_up, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_sign_up, container, false);
+
+        binding.signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                registerUser();
+            }
+        });
+
+
+        return binding.getRoot();
+    }
+
+
+    private void registerUser(){
+        String email = binding.emailSignUpEdit.getText().toString();
+        String password = binding.passwordSignUpEdit.getText().toString();
+        if(!email.isEmpty() && !password.isEmpty()){
+            final HashMap<String, Object> map = new HashMap<>();
+            map.put("email", email);
+            map.put("password", password);
+            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()){
+                        FirebaseUser user = auth.getCurrentUser();
+                        FirebaseDatabase.getInstance().getReference("user").child(auth.getCurrentUser().
+                                getUid()).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Toast.makeText(getActivity(), "Successful", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+
+
+                    }
+                    else {
+                        Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
     }
 }

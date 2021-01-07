@@ -19,4 +19,9 @@
     <string name="date">Date</string>
     <string name="status">Status Trip</string>
     <string name="note">Note</string>
+
+    <string name="confirm_password">Confirm Password</string>
+
+    <string name="or_sign_up_with">OR sign up with</string>
+    <string name="sign_up_with_google">Sign Up with Google</string>
 </resources>
