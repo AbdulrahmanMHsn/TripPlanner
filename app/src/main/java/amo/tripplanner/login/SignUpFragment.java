@@ -16,13 +16,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.FragmentSignUpBinding;
+
 
 public class SignUpFragment extends Fragment {
 
@@ -60,6 +61,8 @@ public class SignUpFragment extends Fragment {
     private void registerUser(){
         String email = binding.emailSignUpEdit.getText().toString();
         String password = binding.passwordSignUpEdit.getText().toString();
+
+
         if(!email.isEmpty() && !password.isEmpty()){
             final HashMap<String, Object> map = new HashMap<>();
             map.put("email", email);
@@ -68,18 +71,28 @@ public class SignUpFragment extends Fragment {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
-                        FirebaseUser user = auth.getCurrentUser();
-                        FirebaseDatabase.getInstance().getReference("user").child(auth.getCurrentUser().
+
+                        FirebaseDatabase.getInstance().getReference("User").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).
                                 getUid()).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()){
-                                    Toast.makeText(getActivity(), "Successful", Toast.LENGTH_SHORT).show();
+
+                                    FirebaseDatabase.getInstance().getReference("user").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).setValue(map)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if(task.isSuccessful()) {
+                                                        Toast.makeText(getActivity(), "gggg", Toast.LENGTH_SHORT).show();
+                                                    }else {
+                                                        Toast.makeText(getActivity(), task.toString(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
+
                                 }
                             }
                         });
-
-
 
                     }
                     else {
