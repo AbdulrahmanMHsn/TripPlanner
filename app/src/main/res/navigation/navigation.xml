@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_loginFragment_to_tripDetailsFragment"
             app:destination="@id/tripDetailsFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
@@ -26,4 +29,20 @@
         android:id="@+id/tripDetailsFragment"
         android:name="amo.tripplanner.trips.TripDetailsFragment"
         android:label="TripDetailsFragment" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="amo.tripplanner.homeScreen.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_tripDetailsFragment"
+            app:destination="@id/tripDetailsFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_addFragmentFragment"
+            app:destination="@id/addFragmentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addFragmentFragment"
+        android:name="amo.tripplanner.newtrip.AddFragmentFragment"
+        android:label="AddFragmentFragment" />
 </navigation>
