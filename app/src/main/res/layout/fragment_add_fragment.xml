@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:weightSum="4"
+        tools:context=".newtrip.AddFragmentFragment">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_gravity="center">
+
+                    <EditText
+                    android:id="@+id/id_edit_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:backgroundTint="@color/background"
+                    android:ems="10"
+                    android:hint="Enter The name of trip"
+                    android:inputType="textPersonName"
+                    android:textColor="@android:color/black"
+                    android:textSize="26sp"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:layout_marginTop="20dp"                    />
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2"
+                android:layout_gravity="center">
+
+                <LinearLayout
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:orientation="horizontal"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    >
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/end_point"
+                        android:layout_gravity="center"
+                        android:textColor="@android:color/black"
+                        />
+
+                    <EditText
+                        android:id="@+id/id_edit_start_point"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/background"
+                        android:drawableEnd="@drawable/ic_location"
+                        android:ems="10"
+                        android:inputType="textPersonName"
+                        android:textColor="@android:color/black"
+                        android:textSize="26sp"
+              />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/end_point"
+                 android:layout_gravity="center"
+                android:textColor="@android:color/black"/>
+
+            <EditText
+                android:id="@+id/id_edit_end_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/background"
+                android:drawableEnd="@drawable/ic_location"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:textColor="@android:color/black"
+                android:textSize="26sp"
+                />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:weightSum="2"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <EditText
+                    android:id="@+id/id_edt_date"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/background"
+                    android:ems="10"
+                    android:hint="Date"
+                    android:layout_weight="1"
+                    android:inputType="textPersonName"
+                    android:textColor="@android:color/black"
+                    android:textSize="26sp"
+                    />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <NumberPicker
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <NumberPicker
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <EditText
+                    android:id="@+id/id_edt_Time"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/background"
+                    android:hint="Time"
+                    android:layout_weight="1"
+                    android:inputType="textPersonName"
+                    android:textColor="@android:color/black"
+                    android:layout_marginStart="20sp"
+                    android:textSize="26sp"
+                    />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <NumberPicker
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <NumberPicker
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/id_rounded_direction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rponded_dir"
+                android:textColor="@android:color/black"
+                android:textSize="26sp"
+                android:layout_gravity="center"
+          />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:textColor="@color/background"
+                android:layout_gravity="center"
+                android:layout_marginStart="30dp"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+</layout>

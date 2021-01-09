@@ -84,7 +84,7 @@ public class LoginFragment extends Fragment {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()){
                         Toast.makeText(getActivity(), "Successful", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_signUpFragment);
+                        Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
                     }
                     else{
                         Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
