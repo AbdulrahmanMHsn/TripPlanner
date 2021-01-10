@@ -1,6 +1,7 @@
 package amo.tripplanner.login;
 
 import android.content.Context;
+import android.nfc.tech.NfcA;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,12 +21,17 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Objects;
+
+import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.FragmentLoginBinding;
 
 
 public class LoginFragment extends Fragment {
+
 
 
 
@@ -42,6 +48,8 @@ public class LoginFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
+
+
     }
 
     @Override
@@ -51,46 +59,50 @@ public class LoginFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
 
 
-        binding.loginButton.setOnClickListener(new View.OnClickListener() {
+        binding.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 login();
             }
         });
         view = container;
-        binding.signupButton.setOnClickListener(new View.OnClickListener() {
+        binding.textSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Navigation.findNavController(container).navigate(R.id.action_loginFragment_to_signUpFragment);
             }
         });
 
-        binding.loginGoogleButton.setOnClickListener(new View.OnClickListener() {
+        binding.GoogleLoginImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
         });
+
+
+
         return binding.getRoot();
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+
     }
 
     private void login(){
-        String email = binding.emailEdit.getText().toString();
-        String password = binding.passwordEdit.getText().toString();
+        String email = binding.editEmailLogin.getText().toString();
+        String password = binding.editPasswordLogin.getText().toString();
 
-        if (!email.isEmpty() && !password.isEmpty()){
-            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()){
-                        Toast.makeText(getActivity(), "Successful", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
-                    }
-                    else{
-                        Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+        if (!email.isEmpty() && !password.isEmpty()) {
+            if (FirebaseHelper.getInstance(getContext()).userLogin(email,password,getContext())) {
+                Toast.makeText(getActivity(), "Successful", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
+                FirebaseHelper.loggedIn = false;
+            } else {
+                Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
+            }
+
         }
 
     }

@@ -33,4 +33,6 @@
     <string name="startPoint">Start Point</string>
     <string name="endPoint">End Point</string>
     <string name="rponded_dir">Rounded Direction</string>
+    <string name="trips">Trips</string>
+    <string name="don_t_have_an_account_sign_up">Don\'t have an account? Sign Up</string>
 </resources>

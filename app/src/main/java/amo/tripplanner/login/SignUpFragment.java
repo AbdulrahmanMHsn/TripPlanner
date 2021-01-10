@@ -29,6 +29,7 @@ public class SignUpFragment extends Fragment {
 
     FragmentSignUpBinding binding;
     private FirebaseAuth auth;
+
     public SignUpFragment() {
         // Required empty public constructor
     }
@@ -46,7 +47,7 @@ public class SignUpFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_sign_up, container, false);
 
-        binding.signUpButton.setOnClickListener(new View.OnClickListener() {
+        binding.buttonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 registerUser();
@@ -59,8 +60,8 @@ public class SignUpFragment extends Fragment {
 
 
     private void registerUser(){
-        String email = binding.emailSignUpEdit.getText().toString();
-        String password = binding.passwordSignUpEdit.getText().toString();
+        String email = binding.editEmailSignup.getText().toString();
+        String password = binding.editPasswordSignUp.getText().toString();
 
 
         if(!email.isEmpty() && !password.isEmpty()){

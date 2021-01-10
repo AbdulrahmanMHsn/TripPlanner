@@ -30,6 +30,18 @@
         android:name="amo.tripplanner.trips.TripDetailsFragment"
         android:label="TripDetailsFragment" />
     <fragment
+        android:id="@+id/splashFragment"
+        android:name="amo.tripplanner.SplashFragment"
+        android:label="fragment_splash"
+        tools:layout="@layout/fragment_splash" >
+        <action
+            android:id="@+id/action_splashFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_tripDetailsFragment"
+            app:destination="@id/tripDetailsFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/homeFragment"
         android:name="amo.tripplanner.homeScreen.HomeFragment"
         android:label="fragment_home"
