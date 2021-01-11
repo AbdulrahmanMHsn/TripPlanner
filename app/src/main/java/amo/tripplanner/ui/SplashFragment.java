@@ -1,4 +1,4 @@
-package amo.tripplanner;
+package amo.tripplanner.ui;
 
 import android.os.Bundle;
 
@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,24 +15,22 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+
+import amo.tripplanner.R;
 
 
 public class SplashFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener authStateListener;
-    FirebaseAuth auth;
+    private FirebaseAuth auth;
+
     public SplashFragment() {
         // Required empty public constructor
     }
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -52,7 +49,7 @@ public class SplashFragment extends Fragment {
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            Navigation.findNavController(container).navigate(R.id.action_splashFragment_to_tripDetailsFragment);
+                            Navigation.findNavController(container).navigate(R.id.action_splashFragment_to_homeFragment);
                         }
                     }, 3000);
                 }
@@ -68,8 +65,6 @@ public class SplashFragment extends Fragment {
                 }
             }
         };
-
-
 
         return inflater.inflate(R.layout.fragment_splash, container, false);
     }

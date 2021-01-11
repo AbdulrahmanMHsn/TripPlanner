@@ -1,65 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="2dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginEnd="2dp"
-    app:cardBackgroundColor="#FFFFFF">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:backgroundTint="#FFFFFF">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="2dp"
+        app:cardBackgroundColor="#FFFFFF">
 
-        <TextView
-            android:id="@+id/id_trip_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:gravity="center"
-            android:text="Name"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/black"
-            android:textSize="30sp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white">
 
-        <TextView
-            android:id="@+id/id_trip_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/id_trip_name"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="Date"
-            android:textColor="@android:color/black"
-            android:textSize="25sp" />
+            <TextView
+                android:id="@+id/id_trip_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:gravity="center"
+                android:text="Name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@android:color/black"
+                android:textSize="30sp" />
 
-        <Button
-            android:id="@+id/id_btn_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/id_trip_date"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="#FFFFFF"
-            android:gravity="center"
-            android:text="@string/btn_start"
-            android:textColor="@color/background"
-            android:textSize="16dp" />
+            <TextView
+                android:id="@+id/id_trip_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/id_trip_name"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Date"
+                android:textColor="@android:color/black"
+                android:textSize="25sp" />
 
-        <ImageView
-            android:id="@+id/id_icon_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="8dp"
-            />
+            <Button
+                android:id="@+id/id_btn_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/id_trip_date"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/btn_start"
+                android:textColor="@color/background"
+                android:textSize="16dp" />
 
-    </RelativeLayout>
-</androidx.cardview.widget.CardView>
+            <ImageButton
+                android:id="@+id/id_icon_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:src="@drawable/ic_list" />
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

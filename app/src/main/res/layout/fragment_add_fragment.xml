@@ -9,7 +9,7 @@
         android:background="#FFFFFF"
         android:orientation="vertical"
         android:weightSum="4"
-        tools:context=".newtrip.AddFragmentFragment">
+        tools:context=".ui.home.AddFragmentFragment">
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

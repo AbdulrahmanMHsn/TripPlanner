@@ -28,7 +28,7 @@ public class FirebaseHelper {
     public static FirebaseDatabase mDatabase;
 
     public static DatabaseReference mDatabaseReference;
-    public static boolean loggedIn  = false;
+    public boolean loggedIn  = false;
     public static boolean signed_up  = false;
     public static boolean userRegistered  = false;
 

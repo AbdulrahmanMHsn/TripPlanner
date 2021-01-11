@@ -1,4 +1,4 @@
-package amo.tripplanner.homeScreen;
+package amo.tripplanner.pojo;
 
 import android.widget.CheckBox;
 
@@ -12,7 +12,12 @@ public class TripPojo {
         //empty constructor needed
     }
 
-    public TripPojo(String tripDate, String tripName,String time,String endPoint,String startPoint) {
+    public TripPojo(String tripName, String startPoint) {
+        this.tripName = tripName;
+        this.startPoint = startPoint;
+    }
+
+    public TripPojo(String tripDate, String tripName, String time, String endPoint, String startPoint) {
         this.date = tripDate;
         this.tripName=tripName;
         this.endPoint=endPoint;
