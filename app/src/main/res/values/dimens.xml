@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--TextSize-->
+    <!--Text error-->
+    <dimen name="micro_text">12sp</dimen>
+    <!--Paragraph text or List titles or Buttons or Tabs-->
+    <dimen name="small_text">14sp</dimen>
+    <!--List item titles, Important text snippets , Text inputs	-->
+    <dimen name="medium_text">16sp</dimen>
+    <!--Page titles-->
+    <dimen name="large_text">20sp</dimen>
+
+
+    <!--Toolbar-->
+    <dimen name="height_toolbar">60dp</dimen>
+
+    <!--BottomNavigationView-->
+    <dimen name="height_bottom_navigation">50dp</dimen>
+    <dimen name="big_title">35sp</dimen>
+
+</resources>
