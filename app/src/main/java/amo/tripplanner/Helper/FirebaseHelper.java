@@ -2,8 +2,11 @@ package amo.tripplanner.Helper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -13,8 +16,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+import java.util.Objects;
 
-import amo.tripplanner.pojo.User;
+import amo.tripplanner.R;
 
 public class FirebaseHelper {
 
@@ -28,9 +32,6 @@ public class FirebaseHelper {
     public static FirebaseDatabase mDatabase;
 
     public static DatabaseReference mDatabaseReference;
-    public boolean loggedIn  = false;
-    public static boolean signed_up  = false;
-    public static boolean userRegistered  = false;
 
 
 
@@ -38,8 +39,6 @@ public class FirebaseHelper {
         this.context = context;
     }
 
-
-    //query.orderByChild("date").startAt(new DateTime().getMillis())
 
     public static FirebaseHelper getInstance(Context context) {
 
@@ -62,7 +61,7 @@ public class FirebaseHelper {
     }
 
 
-    public boolean userLogin(String email, String password, final Context context) {
+    public void userLogin(String email, String password, final Context context, final View view) {
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.signInWithEmailAndPassword(email, password)
@@ -70,63 +69,48 @@ public class FirebaseHelper {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            loggedIn = true;
+                            Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
                         } else {
-                            loggedIn = false;
+                            Toast.makeText(context, "failed", Toast.LENGTH_SHORT);
                         }
                     }
                 });
-        return loggedIn;
+
     }
 
 
-   /* public static boolean signUp(final String email, final String password) {
+    public static void signUp(final String email, final String password, final Context context, final View view, final int id) {
 
-        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
+        final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth.createUserWithEmailAndPassword(email, password).
+                addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            final HashMap<String, String> map = new HashMap<>();
+                            map.put("email", email);
+                            map.put("password", password);
+                            FirebaseDatabase.getInstance().getReference("user")
+                                    .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).setValue(map)
+                                    .addOnCompleteListener((Activity) context, new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Navigation.findNavController(view).navigate(id);
+                                            } else {
+                                                Toast.makeText(context, "failed", Toast.LENGTH_SHORT);
+                                            }
+                                        }
+                                    });
+                        } else {
 
-                    if (addUser(new User(email, password)) == true){
+                        }
                     }
-                } else {
-                }
-            }
-        });
+                });
 
 
     }
 
-
-    public static boolean addUser(final User user) {
-        final boolean[] userAdded = new boolean[1];
-        final HashMap<String, Object> map = new HashMap<>();
-        map.put("email", user.getEmail());
-        map.put("password", user.getPassword());
-
-        auth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-
-                    FirebaseDatabase.getInstance().getReference("user").child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).setValue(map)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        userAdded[0] = true;
-                                    } else {
-                                        userAdded[0] = false;
-                                    }
-                                }
-                            });
-
-                }
-            }
-        });
-        return userAdded[0];
-
-    }*/
 
 }
+

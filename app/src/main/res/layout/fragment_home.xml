@@ -12,7 +12,7 @@
         tools:ignore="Orientation">
 
         <TextView
-            android:text="To DO"
+            android:text="To Do"
             android:textSize="32sp"
             android:fontFamily="sans-serif-black"
             android:gravity="center|start"

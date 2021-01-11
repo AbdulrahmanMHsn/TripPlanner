@@ -40,4 +40,5 @@
     <string name="todo">ToDo</string>
     <string name="start">Start</string>
     <string name="menu">menu</string>
+    <string name="mytrips">mytrips</string>
 </resources>
