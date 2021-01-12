@@ -124,6 +124,7 @@ public class AddTripFragment extends Fragment {
             public void onClick(View v) {
                 goToAutoComplete();
                 isStart = true;
+
             }
         });
 
