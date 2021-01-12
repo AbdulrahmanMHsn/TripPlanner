@@ -40,5 +40,13 @@
     <string name="todo">ToDo</string>
     <string name="start">Start</string>
     <string name="menu">menu</string>
-    <string name="mytrips">mytrips</string>
+    <string name="mytrips">My recent trips</string>
+    <string name="search_trip">Search Trip</string>
+    <string name="tripTime">Time</string>
+    <string name="rounded_direction">Round Trip</string>
+    <string name="create_now">Create</string>
+    <string name="cancel">cancel</string>
+
+    <string name="access_token">pk.eyJ1IjoiYWJkdWxyYWhtYW5taHNuIiwiYSI6ImNranE4YmV6aDBicHQycnFoMTlwbmpmankifQ.l24EiCVSoJwgYK6Mo1c0MA</string>
+
 </resources>

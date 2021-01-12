@@ -9,7 +9,7 @@
         android:background="#FFFFFF"
         android:orientation="vertical"
         android:weightSum="4"
-        tools:context=".ui.home.AddFragmentFragment">
+        tools:context=".newtrip.AddFragmentFragment">
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -106,95 +106,76 @@
             android:weightSum="2"
             android:orientation="horizontal"
             android:layout_gravity="center">
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <EditText
+
+                <TextView
                     android:id="@+id/id_edt_date"
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/background"
                     android:ems="10"
-                    android:hint="Date"
-                    android:layout_weight="1"
-                    android:inputType="textPersonName"
+                    android:text="Select Time"
+                    android:layout_gravity="center"
                     android:textColor="@android:color/black"
                     android:textSize="26sp"
                     />
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <NumberPicker
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
 
-                    <NumberPicker
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <EditText
+                <TextView
                     android:id="@+id/id_edt_Time"
-                    android:layout_width="120dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/background"
-                    android:hint="Time"
-                    android:layout_weight="1"
+                    android:text="Select Date"
                     android:inputType="textPersonName"
+                    android:layout_gravity="center"
                     android:textColor="@android:color/black"
                     android:layout_marginStart="20sp"
                     android:textSize="26sp"
                     />
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <NumberPicker
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <NumberPicker
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-            </LinearLayout>
-
-
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_weight="1"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+>
 
-            <TextView
-                android:id="@+id/id_rounded_direction"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/rponded_dir"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+               >
+
+                <TextView
+                    android:id="@+id/id_rounded_direction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/rponded_dir"
+                    android:textColor="@android:color/black"
+                    android:textSize="26sp"
+                    android:layout_gravity="center"
+                    />
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:textColor="@color/background"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="30dp"/>
+            </LinearLayout>
+            <Button
+                android:id="@+id/bottomAdd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add Note"
+                android:background="@color/background"
                 android:textColor="@android:color/black"
                 android:textSize="26sp"
-                android:layout_gravity="center"
-          />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:textColor="@color/background"
-                android:layout_gravity="center"
-                android:layout_marginStart="30dp"/>
+                android:layout_marginTop="16dp"
+                />
         </LinearLayout>
+
 
 
     </LinearLayout>

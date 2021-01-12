@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -7,11 +9,10 @@
 
     <merge>
 
-        <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/height_toolbar"
-            android:background="@drawable/purple_border_bottom">
+            android:layout_height="100dp"
+            android:background="#441E59">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/subject_toolbar"
@@ -20,31 +21,62 @@
                 android:theme="@style/ToolbarTheme">
 
 
-                <RelativeLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
+
                     <ImageView
+                        android:id="@+id/toolbar_navDrawer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:layout_centerInParent="true"
-                        android:id="@+id/toolbar_navDrawer"
+                        android:layout_marginTop="8dp"
+                        android:contentDescription="@string/menu"
                         android:src="@drawable/ic_menu"
-                        />
-
+                        app:layout_constraintBottom_toTopOf="@+id/editText"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.2" />
 
                     <TextView
+                        android:id="@+id/textView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
                         android:layout_centerInParent="true"
-                        android:layout_centerVertical="true"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-condensed-medium"
                         android:text="@string/mytrips"
                         android:textColor="@android:color/white"
                         android:textSize="@dimen/large_text"
+                        app:layout_constraintBottom_toTopOf="@+id/editText"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.435"
+                        app:layout_constraintStart_toEndOf="@+id/toolbar_navDrawer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0"
                         tools:ignore="HardcodedText,RelativeOverlap,RtlCompat" />
 
-                </RelativeLayout>
+                    <EditText
+                        android:id="@+id/editText"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_centerInParent="true"
+                        android:layout_margin="18dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/background_search"
+                        android:hint="@string/search_trip"
+                        android:paddingStart="16dp"
+                        android:textSize="16dp"
+                        android:textColorHint="#B5B5B5"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/textView"
+                        app:layout_constraintHorizontal_bias="0.946"
+                        app:layout_constraintStart_toStartOf="@+id/textView" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
 
             </androidx.appcompat.widget.Toolbar>

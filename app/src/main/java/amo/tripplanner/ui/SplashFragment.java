@@ -45,24 +45,17 @@ public class SplashFragment extends Fragment {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = auth.getCurrentUser();
-                if (user != null){
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            Navigation.findNavController(container).navigate(R.id.action_splashFragment_to_homeFragment);
-                        }
-                    }, 3000);
-                }
 
-                else {
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (user != null) {
+                            Navigation.findNavController(container).navigate(R.id.action_splashFragment_to_homeFragment);
+                        } else {
                             Navigation.findNavController(container).navigate(R.id.action_splashFragment_to_loginFragment);
                         }
-                    }, 3000);
-
-                }
+                    }
+                }, 2000);
             }
         };
 

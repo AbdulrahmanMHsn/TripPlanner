@@ -11,7 +11,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="198dp"
-            android:background="@color/background"
+            android:background="#F9EA85"
             android:orientation="vertical">
 
             <TextView
@@ -20,22 +20,21 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="18dp"
+                android:gravity="center"
                 android:text="@string/trip_add"
                 android:textAlignment="center"
-                android:gravity="center"
                 android:textColor="@android:color/black"
-                android:textSize="26sp" />
+                android:textSize="22sp" />
 
-            <TextView
-                android:id="@+id/dialog_txtVW_back"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="18dp"
+            <ImageView
+                android:id="@+id/addTrip_img_back"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/arrow_left"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
-                android:background="@drawable/arrow_left"
                 android:textSize="26sp" />
 
         </RelativeLayout>
@@ -46,10 +45,9 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="-100dp"
             android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            android:orientation="vertical"
-            android:paddingTop="22dp"
-            android:paddingBottom="22dp">
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/background_item_subject"
+            android:orientation="vertical">
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -57,199 +55,158 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:orientation="vertical"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+
+                    <EditText
+                        android:id="@+id/addTrip_edTxtVw_tripName"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/background_put_subject"
+                        android:hint="@string/trip_name"
+                        android:inputType="text"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@android:color/black"
+                        android:textColorHint="#B5B5B5"
+                        tools:ignore="Autofill,LabelFor,RtlSymmetry" />
+
+                    <Button
+                        android:id="@+id/addTrip_edTxtVw_tripStartPoint"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/background_put_subject"
+                        android:drawableRight="@drawable/ic_search"
+                        android:hint="@string/start_point"
+                        android:inputType="text"
+                        android:gravity="start|center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@android:color/black"
+                        android:textColorHint="#B5B5B5"
+                        tools:ignore="Autofill,LabelFor,RtlSymmetry" />
+
+                    <Button
+                        android:id="@+id/addTrip_edTxtVw_tripEndPoint"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/background_put_subject"
+                        android:drawableRight="@drawable/ic_search"
+                        android:hint="@string/end_point"
+                        android:inputType="text"
+                        android:gravity="start|center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:textColor="@android:color/black"
+                        android:textColorHint="#B5B5B5"
+                        tools:ignore="Autofill,LabelFor,RtlSymmetry" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
                         android:orientation="horizontal"
-                        tools:ignore="UselessParent">
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:text="@string/trip_name"
-                            android:textColor="@android:color/black"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tripDetails_txtVw_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="55dp"
+                        <Button
+                            android:id="@+id/addTrip_edTxtVw_tripDate"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
                             android:background="@drawable/background_put_subject"
-                            android:inputType="text"
+                            android:hint="@string/tripDate"
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
                             android:textColor="@android:color/black"
                             android:textColorHint="#B5B5B5"
-                            tools:ignore="Autofill,RtlSymmetry" />
+                            tools:ignore="Autofill,LabelFor,RtlSymmetry" />
+
+                        <Button
+                            android:id="@+id/addTrip_edTxtVw_tripTime"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_weight="1"
+                            android:background="@drawable/background_put_subject"
+                            android:hint="@string/tripTime"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:textColor="@android:color/black"
+                            android:textColorHint="#B5B5B5"
+                            tools:ignore="Autofill,LabelFor,RtlSymmetry" />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginRight="16dp"
-                        android:orientation="vertical"
-                        tools:ignore="UselessParent">
+                        android:layout_height="40dp"
+                        android:layout_margin="16dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:text="@string/start_point"
-                            android:textColor="@android:color/black"
-                            android:textSize="18sp" />
+                        <CheckBox
+                            android:id="@+id/addTrip_chBox_rounded"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
+                            android:text="@string/rounded_direction" />
 
-                        <TextView
-                            android:id="@+id/tripDetails_txtVw_startPoint"
-                            android:layout_width="match_parent"
-                            android:layout_height="55dp"
-                            android:background="@drawable/background_put_subject"
-                            android:inputType="text"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            android:textColor="@android:color/black"
-                            android:textColorHint="#B5B5B5"
-                            tools:ignore="Autofill,RtlSymmetry" />
+                        <Spinner
+                            android:id="@+id/addTrip_spn_choose"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1" />
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginRight="16dp"
-                        android:orientation="vertical"
-                        tools:ignore="UselessParent">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:text="@string/end_point"
-                            android:textColor="@android:color/black"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tripDetails_txtVw_endPoint"
-                            android:layout_width="match_parent"
-                            android:layout_height="55dp"
-                            android:background="@drawable/background_put_subject"
-                            android:inputType="text"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            android:textColor="@android:color/black"
-                            android:textColorHint="#B5B5B5"
-                            tools:ignore="Autofill,RtlSymmetry" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginRight="16dp"
-                        android:orientation="vertical"
-                        tools:ignore="UselessParent">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:text="@string/date"
-                            android:textColor="@android:color/black"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tripDetails_txtVw_status"
-                            android:layout_width="match_parent"
-                            android:layout_height="55dp"
-                            android:background="@drawable/background_put_subject"
-                            android:inputType="text"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            android:textColor="@android:color/black"
-                            android:textColorHint="#B5B5B5"
-                            tools:ignore="Autofill,RtlSymmetry" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginRight="16dp"
-                        android:orientation="vertical"
-                        tools:ignore="UselessParent">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:text="@string/status"
-                            android:textColor="@android:color/black"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tripDetails_txtVw_date"
-                            android:layout_width="match_parent"
-                            android:layout_height="55dp"
-                            android:background="@drawable/background_put_subject"
-                            android:inputType="text"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            android:textColor="@android:color/black"
-                            android:textColorHint="#B5B5B5"
-                            tools:ignore="Autofill,RtlSymmetry" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginRight="16dp"
-                        android:orientation="vertical"
-                        tools:ignore="UselessParent">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:text="@string/note"
-                            android:textColor="@android:color/black"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tripDetails_txtVw_note"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/background_put_subject"
-                            android:inputType="text"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            android:textColor="@android:color/black"
-                            android:textColorHint="#B5B5B5"
-                            tools:ignore="Autofill,RtlSymmetry" />
-
-                    </LinearLayout>
 
                 </LinearLayout>
+
 
             </ScrollView>
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/addTrip_btn_save"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/background_btn_create"
+            android:text="@string/create_now"
+            android:textAllCaps="false"
+            android:textColor="#FFF"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/addTrip_btn_close"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/background_btn_cancel"
+            android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textColor="#000"
+            android:textSize="22sp" />
 
     </LinearLayout>
 </layout>

@@ -1,5 +1,6 @@
 package amo.tripplanner.database.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -15,7 +16,7 @@ import amo.tripplanner.pojo.Trip;
 public interface TripDao {
 
     @Query("SELECT * FROM trip_table")
-    List<Trip> getAllTrips();
+    LiveData<List<Trip>> getAllTrips();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertTrip(Trip trip);

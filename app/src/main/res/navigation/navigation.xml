@@ -55,6 +55,10 @@
     </fragment>
     <fragment
         android:id="@+id/addFragmentFragment"
-        android:name="amo.tripplanner.ui.home.AddFragmentFragment"
-        android:label="AddFragmentFragment" />
+        android:name="amo.tripplanner.ui.home.AddTripFragment"
+        android:label="AddFragmentFragment" >
+        <action
+            android:id="@+id/action_addFragmentFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>

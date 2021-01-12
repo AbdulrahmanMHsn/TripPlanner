@@ -5,7 +5,6 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
@@ -25,17 +24,17 @@ public class Trip {
     @ColumnInfo(name = "trip_end")
     private Location tripEndLocation;
 
-    @ColumnInfo(name = "trip_date")
-    private Date tripDate;
-
-    @ColumnInfo(name = "trip_time")
-    private Date tripTime;
+    @ColumnInfo(name = "trip_timestamp")
+    private long tripTimestamp;
 
     @ColumnInfo(name = "trip_status")
     private String tripStatus;
 
     @ColumnInfo(name = "trip_round")
-    private String tripRound;
+    private boolean tripIsRound;
+
+    @ColumnInfo(name = "trip_repeat")
+    private String tripRepeat;
 
     @ColumnInfo(name = "trip_note")
     private List<Note> tripNotes;
@@ -44,11 +43,14 @@ public class Trip {
     public Trip() {
     }
 
-    @Ignore
-    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation) {
+    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat) {
         this.tripName = tripName;
         this.tripStartLocation = tripStartLocation;
         this.tripEndLocation = tripEndLocation;
+        this.tripTimestamp = tripTimestamp;
+        this.tripStatus = tripStatus;
+        this.tripIsRound = tripIsRound;
+        this.tripRepeat = tripRepeat;
     }
 
     @Ignore
@@ -59,21 +61,12 @@ public class Trip {
         this.tripNotes = tripNotes;
     }
 
-    public Date getTripDate() {
-        return tripDate;
+    public Trip(String assa, Location eldohi, Location eldohi1) {
+        this.tripName = assa;
+        this.tripStartLocation = eldohi;
+        this.tripEndLocation = eldohi1;
     }
 
-    public void setTripDate(Date tripDate) {
-        this.tripDate = tripDate;
-    }
-
-    public Date getTripTime() {
-        return tripTime;
-    }
-
-    public void setTripTime(Date tripTime) {
-        this.tripTime = tripTime;
-    }
 
     public String getTripStatus() {
         return tripStatus;
@@ -83,12 +76,28 @@ public class Trip {
         this.tripStatus = tripStatus;
     }
 
-    public String getTripRound() {
-        return tripRound;
+    public long getTripTimestamp() {
+        return tripTimestamp;
     }
 
-    public void setTripRound(String tripRound) {
-        this.tripRound = tripRound;
+    public void setTripTimestamp(long tripTimestamp) {
+        this.tripTimestamp = tripTimestamp;
+    }
+
+    public boolean isTripIsRound() {
+        return tripIsRound;
+    }
+
+    public void setTripIsRound(boolean tripIsRound) {
+        this.tripIsRound = tripIsRound;
+    }
+
+    public String getTripRepeat() {
+        return tripRepeat;
+    }
+
+    public void setTripRepeat(String tripRepeat) {
+        this.tripRepeat = tripRepeat;
     }
 
     public List<Note> getTripNotes() {
@@ -131,6 +140,7 @@ public class Trip {
         this.tripEndLocation = tripEndLocation;
     }
 
+
     @Override
     public String toString() {
         return "Trip{" +
@@ -138,7 +148,10 @@ public class Trip {
                 ", tripName='" + tripName + '\'' +
                 ", tripStartLocation=" + tripStartLocation +
                 ", tripEndLocation=" + tripEndLocation +
-                ", tripNotes=" + tripNotes +
+                ", tripTimestamp=" + tripTimestamp +
+                ", tripStatus='" + tripStatus + '\'' +
+                ", tripIsRound=" + tripIsRound +
+                ", tripRepeat='" + tripRepeat + '\'' +
                 '}';
     }
 }
