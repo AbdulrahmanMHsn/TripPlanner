@@ -43,6 +43,7 @@ public class Trip {
     public Trip() {
     }
 
+    @Ignore
     public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat) {
         this.tripName = tripName;
         this.tripStartLocation = tripStartLocation;
@@ -60,13 +61,6 @@ public class Trip {
         this.tripEndLocation = tripEndLocation;
         this.tripNotes = tripNotes;
     }
-
-    public Trip(String assa, Location eldohi, Location eldohi1) {
-        this.tripName = assa;
-        this.tripStartLocation = eldohi;
-        this.tripEndLocation = eldohi1;
-    }
-
 
     public String getTripStatus() {
         return tripStatus;

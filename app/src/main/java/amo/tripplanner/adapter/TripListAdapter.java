@@ -4,11 +4,13 @@ package amo.tripplanner.adapter;
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -19,6 +21,7 @@ import java.util.List;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.TripsItemBinding;
 import amo.tripplanner.pojo.Trip;
+import amo.tripplanner.ui.home.HomeFragmentDirections;
 
 public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripViewHolder> {
 
@@ -26,6 +29,7 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
     private List<Trip> trips = new ArrayList<>();
 
     private OnItemClickListener mListener;
+    private View view;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
@@ -40,6 +44,7 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
     @NonNull
     @Override
     public TripViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        view = parent;
         TripsItemBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.trips_item, parent, false);
 
         return new TripViewHolder(itemBinding);
@@ -48,10 +53,10 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
     @SuppressLint("LogNotTimber")
     @Override
     public void onBindViewHolder(@NonNull TripViewHolder holder, int position) {
-        
+
         if(trips.isEmpty()){
             Log.i(TAG, "onBindViewHolder: my list is empty");
-           return; 
+           return;
         }
         Trip item = trips.get(position);
         holder.itemBinding.itemTxtVwName.setText(item.getTripName());
@@ -59,14 +64,26 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
         holder.itemBinding.itemTxtVwEndPoint.setText(item.getTripEndLocation().getAddress());
         holder.itemBinding.itemTxtVwStatus.setText(item.getTripStatus());
         long time = item.getTripTimestamp();
-        String s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(time);
+        @SuppressLint("SimpleDateFormat")
+        String s = new SimpleDateFormat("yyyy-MM-dd HH:mm aa").format(time);
         Log.i(TAG, "onBindViewHolder: item.getTripStatus() "+ s);
 
+        holder.itemBinding.itemTxtVwTripMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HomeFragmentDirections.ActionHomeFragmentToEditTripFragment action = HomeFragmentDirections.actionHomeFragmentToEditTripFragment();
+                action.setId(item.getTripId());
+                action.setName(item.getTripName());
+                action.setStartPoint(item.getTripStartLocation().getAddress());
+                action.setEndPoint(item.getTripEndLocation().getAddress());
+                action.setTimestamp(item.getTripTimestamp());
+                action.setIsRounded(item.isTripIsRound());
+                action.setRepeat(item.getTripRepeat());
+                Navigation.findNavController(view).navigate(action);
+            }
+        });
+
         holder.itemBinding.ItemLinearLayout.setOnClickListener(view -> {
-            Log.d(TAG, "onClick: navigating to card subject and pass data.");
-//                Intent intent = new Intent(context, CardActivity.class);
-//                intent.putExtra("SUBJECT_EXTRA_ID", list.get(position).getId());
-//                context.startActivity(intent);
             if (mListener != null) {
                 if (position != RecyclerView.NO_POSITION) {
                     mListener.onItemClick(position);

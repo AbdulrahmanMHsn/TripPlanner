@@ -22,7 +22,7 @@ import amo.tripplanner.R;
 
 public class FirebaseHelper {
 
-    Context context;
+    private Context context;
 
 
     public static FirebaseHelper firebaseHelper;

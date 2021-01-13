@@ -48,5 +48,8 @@
     <string name="cancel">cancel</string>
 
     <string name="access_token">pk.eyJ1IjoiYWJkdWxyYWhtYW5taHNuIiwiYSI6ImNranE4YmV6aDBicHQycnFoMTlwbmpmankifQ.l24EiCVSoJwgYK6Mo1c0MA</string>
+    <string name="no_more">No More</string>
+    <string name="edit_trip">Edit Trip</string>
+    <string name="edit">Edit</string>
 
 </resources>

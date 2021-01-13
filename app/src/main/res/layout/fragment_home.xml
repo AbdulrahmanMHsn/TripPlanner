@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#F4F4F4"
         android:orientation="vertical"
-        tools:context=".homeScreen.HomeFragment"
-        tools:ignore="Orientation">
+        tools:context=".homeScreen.HomeFragment">
 
         <LinearLayout
             android:id="@+id/linearLayout2"
@@ -17,6 +16,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@+id/id_recyclerView"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -32,6 +32,7 @@
             android:layout_height="514dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
             tools:listitem="@layout/trips_item" />
@@ -56,6 +57,7 @@
             app:layout_constraintVertical_bias="0.928"
             app:rippleColor="#FFFFFF" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
 
 </layout>

@@ -65,7 +65,6 @@ public class HomeFragment extends Fragment {
 
         bindingHome = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
 
-
         bindingHome.idRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         adapter = new TripListAdapter();

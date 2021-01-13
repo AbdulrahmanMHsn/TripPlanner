@@ -8,6 +8,7 @@ import android.util.Log;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.ActivityMainBinding;
 
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
