@@ -5,7 +5,6 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.util.Date;
 import java.util.List;
 
 @Entity(tableName = "trip_table")
@@ -43,6 +42,7 @@ public class Trip {
     public Trip() {
     }
 
+
     @Ignore
     public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat) {
         this.tripName = tripName;
@@ -55,12 +55,18 @@ public class Trip {
     }
 
     @Ignore
-    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, List<Note> tripNotes) {
+    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat,List<Note> tripNotes) {
         this.tripName = tripName;
         this.tripStartLocation = tripStartLocation;
         this.tripEndLocation = tripEndLocation;
+        this.tripTimestamp = tripTimestamp;
+        this.tripStatus = tripStatus;
+        this.tripIsRound = tripIsRound;
+        this.tripRepeat = tripRepeat;
         this.tripNotes = tripNotes;
     }
+
+
 
     public String getTripStatus() {
         return tripStatus;
@@ -133,7 +139,6 @@ public class Trip {
     public void setTripEndLocation(Location tripEndLocation) {
         this.tripEndLocation = tripEndLocation;
     }
-
 
     @Override
     public String toString() {

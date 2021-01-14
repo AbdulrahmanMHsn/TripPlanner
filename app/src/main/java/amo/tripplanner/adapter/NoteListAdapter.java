@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,10 +32,12 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
 
     private OnItemClickListener mListener;
     private View view;
+    private ItemNoteBinding itemBinding;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         mListener = listener;
     }
@@ -46,7 +49,7 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         view = parent;
-        ItemNoteBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_note, parent, false);
+        itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_note, parent, false);
 
         return new NoteViewHolder(itemBinding);
     }
@@ -55,11 +58,20 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
 
-        if(notes.isEmpty()){
+        if (notes.isEmpty()) {
             Log.i(TAG, "onBindViewHolder: my list note is empty");
-           return;
+            return;
         }
         Note note = notes.get(position);
+        itemBinding.itemNoteTxtVwBody.setText(note.getBody());
+
+        itemBinding.itemNoteImgDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(view.getContext(), position + "", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 
@@ -70,6 +82,7 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
 
     @Override
     public int getItemCount() {
+        Log.i(TAG, "getItemCount: "+notes.size());
         if (notes.size() != 0)
             return notes.size();
         else
@@ -86,6 +99,7 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
     public Note getItem(int position) {
         return notes.get(position);
     }
+
 
     static class NoteViewHolder extends RecyclerView.ViewHolder {
         ItemNoteBinding itemBinding;

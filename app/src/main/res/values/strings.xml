@@ -51,7 +51,13 @@
     <string name="no_more">No More</string>
     <string name="edit_trip">Edit Trip</string>
     <string name="edit">Edit</string>
-
+    <string name="note_add">Add Note</string>
+    <string name="body">body your note</string>
+    <string name="back">back</string>
+    <string name="enter_text">Enter text</string>
+    <string name="reset">reset</string>
+    <string name="add">add</string>
+    <string name="text_empty">Text is empty</string>
 
 
 </resources>

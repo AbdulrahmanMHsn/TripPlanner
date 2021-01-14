@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +40,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import amo.tripplanner.R;
-import amo.tripplanner.databinding.LayoutAddFragmentBinding;
-import amo.tripplanner.databinding.LayoutEditFragmentBinding;
+import amo.tripplanner.databinding.LayoutEditTripBinding;
 import amo.tripplanner.pojo.Location;
 import amo.tripplanner.pojo.Trip;
 import amo.tripplanner.viewmodel.TripListViewModel;
@@ -79,7 +77,7 @@ public class EditTripFragment extends Fragment {
     private static final int REQUEST_CODE_AUTOCOMPLETE = 1;
 
     //biding
-    private LayoutEditFragmentBinding binding;
+    private LayoutEditTripBinding binding;
 
     public EditTripFragment() {
         // Required empty public constructor
@@ -96,7 +94,7 @@ public class EditTripFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.layout_edit_fragment, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.layout_edit_trip, container, false);
 
         if (getArguments() != null) {
             EditTripFragmentArgs args = EditTripFragmentArgs.fromBundle(getArguments());

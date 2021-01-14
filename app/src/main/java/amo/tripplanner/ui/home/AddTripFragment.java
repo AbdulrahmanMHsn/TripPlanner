@@ -18,7 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import android.util.Log;
@@ -27,10 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -41,19 +38,20 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.model.PlaceOptions;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import amo.tripplanner.R;
-import amo.tripplanner.databinding.LayoutAddFragmentBinding;
+import amo.tripplanner.databinding.LayoutAddTripBinding;
 import amo.tripplanner.pojo.Location;
+import amo.tripplanner.pojo.Note;
 import amo.tripplanner.pojo.Trip;
 import amo.tripplanner.reciver.AlarmRciever;
-import amo.tripplanner.ui.MainActivity;
 import amo.tripplanner.viewmodel.TripListViewModel;
 
 import static android.content.Context.ALARM_SERVICE;
@@ -87,7 +85,7 @@ public class AddTripFragment extends Fragment {
     private static final int REQUEST_CODE_AUTOCOMPLETE = 1;
 
     //biding
-    private LayoutAddFragmentBinding binding;
+    private LayoutAddTripBinding binding;
 
     public AddTripFragment() {
         // Required empty public constructor
@@ -103,7 +101,7 @@ public class AddTripFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.layout_add_fragment, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.layout_add_trip, container, false);
 
         return binding.getRoot();
     }
@@ -201,8 +199,9 @@ public class AddTripFragment extends Fragment {
 
                 Location startLocation = new Location(startAddress, startLatitude, startLongitude);
                 Location endLocation = new Location(endAddress, endLatitude, endLongitude);
+                List<Note> list = new ArrayList<>();
 
-                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat);
+                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat,list);
                 insertTrip(trip);
                 Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
 

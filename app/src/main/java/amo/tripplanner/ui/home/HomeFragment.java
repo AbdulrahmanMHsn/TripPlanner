@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -38,7 +39,7 @@ public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
     FragmentHomeBinding bindingHome;
-    
+
     private RecyclerView recyclerView;
     private TripListAdapter adapter;
     View view;
@@ -70,8 +71,14 @@ public class HomeFragment extends Fragment {
         adapter = new TripListAdapter();
         bindingHome.idRecyclerView.setAdapter(adapter);
 
-         listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
-        listViewModel.getAllTrips().observe(getViewLifecycleOwner(), trips ->adapter.setTrips(trips) );
+        listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
+        listViewModel.getAllTrips().observe(getViewLifecycleOwner(), new Observer<List<Trip>>() {
+            @Override
+            public void onChanged(List<Trip> trips) {
+                Log.i(TAG, "onChanged: List<Trip> trips"+trips.size());
+                adapter.setTrips(trips);
+            }
+        });
 
         deleteItemBySwabbing();
 
@@ -104,8 +111,6 @@ public class HomeFragment extends Fragment {
         });
         itemTouchHelper.attachToRecyclerView(bindingHome.idRecyclerView);
     }
-
-
 
 
 }

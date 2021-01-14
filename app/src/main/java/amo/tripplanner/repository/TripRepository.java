@@ -8,8 +8,10 @@ import java.util.List;
 
 import amo.tripplanner.database.AppDatabase;
 import amo.tripplanner.database.dao.TripDao;
+import amo.tripplanner.pojo.Note;
 import amo.tripplanner.pojo.Trip;
 import amo.tripplanner.utilities.AppExecutors;
+
 
 public class TripRepository {
     private static final Object LOCK = new Object();
@@ -34,8 +36,14 @@ public class TripRepository {
         return mInstance;
     }
 
+
     public LiveData<List<Trip>> getAllTrips() {
         return listTrips;
+    }
+
+
+    public LiveData<Trip> getAllNotesById(int tripId) {
+        return tripDao.getAllNotesById(tripId);
     }
 
 
@@ -53,6 +61,16 @@ public class TripRepository {
             @Override
             public void run() {
                 tripDao.updateTrip(trip);
+            }
+        });
+    }
+
+
+    public void update(final int id,final List<Note> notes) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                tripDao.updateTrip(id,notes);
             }
         });
     }

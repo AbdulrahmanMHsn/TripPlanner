@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F4F4F4"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="198dp"
+            android:background="#F9EA85"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="18dp"
+                android:gravity="center"
+                android:text="@string/note_add"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="22sp" />
+
+            <ImageView
+                android:id="@+id/addNote_img_back"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/arrow_left"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="26sp"
+                android:contentDescription="@string/back" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="-60dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_item_subject"
+            android:orientation="vertical"
+            android:paddingBottom="22dp"
+            android:paddingTop="22dp">
+
+            <LinearLayout
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:ignore="UselessParent">
+
+                <TextView
+                    android:textSize="18sp"
+                    android:textColor="@android:color/black"
+                    android:text="@string/note"
+                    android:layout_marginBottom="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/addNote_edTxt_body"
+                    android:inputType="text"
+                    android:background="@drawable/background_put_subject"
+                    android:paddingStart="12dp"
+                    android:textColorHint="#B5B5B5"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:hint="@string/body"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    tools:ignore="Autofill,RtlSymmetry" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/addNote_btn_save"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/background_btn_create"
+            android:text="@string/note_add"
+            android:textAllCaps="false"
+            android:textColor="#FFF"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/addNote_btn_close"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/background_btn_cancel"
+            android:text="@string/cancel"
+            android:textAllCaps="false"
+            android:textColor="#000"
+            android:textSize="22sp" />
+
+    </LinearLayout>
+</layout>

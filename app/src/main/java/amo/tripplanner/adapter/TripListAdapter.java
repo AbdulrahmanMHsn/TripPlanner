@@ -68,20 +68,19 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
         String s = new SimpleDateFormat("yyyy-MM-dd HH:mm aa").format(time);
         Log.i(TAG, "onBindViewHolder: item.getTripStatus() "+ s);
 
-        holder.itemBinding.itemTxtVwTripMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HomeFragmentDirections.ActionHomeFragmentToEditTripFragment action = HomeFragmentDirections.actionHomeFragmentToEditTripFragment();
-                action.setId(item.getTripId());
-                action.setName(item.getTripName());
-                action.setStartPoint(item.getTripStartLocation().getAddress());
-                action.setEndPoint(item.getTripEndLocation().getAddress());
-                action.setTimestamp(item.getTripTimestamp());
-                action.setIsRounded(item.isTripIsRound());
-                action.setRepeat(item.getTripRepeat());
-                Navigation.findNavController(view).navigate(action);
-            }
+
+        holder.itemBinding.itemTxtVwTripMenu.setOnClickListener(v -> {
+            HomeFragmentDirections.ActionHomeFragmentToEditTripFragment action = HomeFragmentDirections.actionHomeFragmentToEditTripFragment();
+            action.setId(item.getTripId());
+            action.setName(item.getTripName());
+            action.setStartPoint(item.getTripStartLocation().getAddress());
+            action.setEndPoint(item.getTripEndLocation().getAddress());
+            action.setTimestamp(item.getTripTimestamp());
+            action.setIsRounded(item.isTripIsRound());
+            action.setRepeat(item.getTripRepeat());
+            Navigation.findNavController(view).navigate(action);
         });
+
 
         holder.itemBinding.ItemLinearLayout.setOnClickListener(view -> {
             if (mListener != null) {
@@ -91,11 +90,11 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
             }
         });
 
-        holder.itemBinding.itemImgTripNote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_noteFragment);
-            }
+
+        holder.itemBinding.itemImgTripNote.setOnClickListener(v -> {
+            HomeFragmentDirections.ActionHomeFragmentToNoteFragment action = HomeFragmentDirections.actionHomeFragmentToNoteFragment();
+            action.setId(item.getTripId());
+            Navigation.findNavController(view).navigate(action);
         });
 
     }
