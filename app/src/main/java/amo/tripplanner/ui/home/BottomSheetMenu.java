@@ -44,12 +44,12 @@ public class BottomSheetMenu extends BottomSheetDialogFragment {
         cv_show=view.findViewById(R.id.cv_show);
         mAuth=FirebaseAuth.getInstance();
 
-        cv_show.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(vv).navigate(R.id.action_homeFragment_to_tripDetailsFragment);
-            }
-        });
+//        cv_show.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Navigation.findNavController(vv).navigate(R.id.action_homeFragment_to_tripDetailsFragment);
+//            }
+//        });
 
         cv_delete.setOnClickListener(new View.OnClickListener() {
             @Override

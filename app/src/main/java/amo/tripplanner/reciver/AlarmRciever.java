@@ -1,0 +1,43 @@
+package amo.tripplanner.reciver;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.widget.Toast;
+
+import amo.tripplanner.R;
+import amo.tripplanner.ui.DailogActivity;
+import amo.tripplanner.ui.MainActivity;
+
+public class AlarmRciever extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+
+
+        int notificationId=intent.getIntExtra("notificationId",0);
+        Toast.makeText(context, "ggggggggg", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(context, DailogActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i);
+        String msg=intent.getStringExtra("Message");
+
+//        Intent mainIntent=new Intent(context, MainActivity.class);
+//        PendingIntent pendingIntent=PendingIntent.getActivity(context,0,mainIntent,0);
+
+        NotificationManager notificationManager=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification.Builder builder=new Notification.Builder(context);
+        builder.setSmallIcon(R.drawable.ic_account)
+                .setContentTitle("TRIP TO DO")
+                .setContentText(msg)
+                .setWhen(System.currentTimeMillis())
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_MAX)
+                .setDefaults(Notification.DEFAULT_ALL);
+
+        notificationManager.notify(notificationId,builder.build());
+    }
+}

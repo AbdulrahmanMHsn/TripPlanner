@@ -2,6 +2,7 @@ package amo.tripplanner.ui.home;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -32,6 +33,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.model.PlaceOptions;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -54,6 +56,13 @@ public class EditTripFragment extends Fragment {
     private long dateInMilliseconds;
     private boolean isStart;
     private String[] repeats = {"No Repeat", "Repeat Daily", "Repeat Monthly", "Repeat Weekly"};
+    Calendar currentCalendar = Calendar.getInstance();
+
+    //Alarm
+    AlarmManager alarmManager;
+    private int notificationId = 1;
+    private int mYear, mMonth, mDay, currentHour, currentMin;
+    private String amPm;
 
     //vars trip
     private int id;
@@ -99,10 +108,19 @@ public class EditTripFragment extends Fragment {
             tripIsRound = args.getIsRounded();
             tripRepeat = args.getRepeat();
 
+            Timestamp ts = new Timestamp(timestamp);
+            Date date = ts;
+
+            String[] timeDate = date.toString().split(" ");
+            String dates = timeDate[0];
+            String times = timeDate[1];
+
             binding.editTripEdTxtVwTripName.setText(tripName);
             binding.editTripEdTxtVwTripStartPoint.setText(startAddress);
             binding.editTripEdTxtVwTripEndPoint.setText(endAddress);
             binding.editTripChBoxRounded.setChecked(tripIsRound);
+            binding.editTripEdTxtVwTripDate.setText(dates);
+            binding.editTripEdTxtVwTripTime.setText(times);
         }
 //        binding.editTripSpnChoose.set(tripIsRound);
 
@@ -180,8 +198,46 @@ public class EditTripFragment extends Fragment {
         binding.editTripBtnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.YEAR, mYear);
+                calendar.set(Calendar.MONTH, mMonth);
+                calendar.set(Calendar.DAY_OF_MONTH, mDay);
+                calendar.set(Calendar.HOUR_OF_DAY, currentHour);
+                calendar.set(Calendar.MINUTE, currentMin);
+                calendar.set(Calendar.SECOND, 0);
+                timestamp = calendar.getTimeInMillis();
+
+                if (binding.editTripEdTxtVwTripName.getText().toString().isEmpty()) {
+                    binding.editTripEdTxtVwTripName.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (binding.editTripEdTxtVwTripStartPoint.getText().toString().isEmpty()) {
+                    binding.editTripEdTxtVwTripStartPoint.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (binding.editTripEdTxtVwTripEndPoint.getText().toString().isEmpty()) {
+                    binding.editTripEdTxtVwTripEndPoint.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (binding.editTripEdTxtVwTripDate.getText().toString().isEmpty()) {
+                    binding.editTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (binding.editTripEdTxtVwTripTime.getText().toString().isEmpty()) {
+                    binding.editTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (timestamp < currentCalendar.getTimeInMillis()) {
+                    binding.editTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);
+                    binding.editTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
                 tripName = binding.editTripEdTxtVwTripName.getText().toString();
-                timestamp = timeInMilliseconds + dateInMilliseconds;
 
                 Location startLocation = new Location(startAddress, startLatitude, startLongitude);
                 Location endLocation = new Location(endAddress, endLatitude, endLongitude);
@@ -226,39 +282,39 @@ public class EditTripFragment extends Fragment {
      * A function use to open TimePickerDialog
      * */
     private void showTimePickerDialog() {
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), android.R.style.Theme_Holo_Light_Dialog,
-                new TimePickerDialog.OnTimeSetListener() {
-                    @SuppressLint("SimpleDateFormat")
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                        Date date = null;
-                        try {
-                            date = new SimpleDateFormat("HH:mm").parse(hourOfDay + ":" + minute);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        if (date != null) {
-                            binding.editTripEdTxtVwTripTime.setText(new SimpleDateFormat("hh : mm aa").format(date));
-                            timeInMilliseconds = date.getTime();
-                        }
+        Calendar calendar = Calendar.getInstance();
+        currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        currentMin = calendar.get(Calendar.MINUTE);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), android.R.style.Theme_Holo_Light_Dialog, new TimePickerDialog.OnTimeSetListener() {
+            @SuppressLint({"SetTextI18n", "DefaultLocale"})
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                if (hourOfDay >= 12) {
+                    amPm = "PM";
+                } else {
+                    amPm = "AM";
+                }
+                binding.editTripEdTxtVwTripTime.setText(String.format("%02d : %02d ", hourOfDay, minute) + amPm);
+                currentHour = hourOfDay;
+                currentMin = minute;
 
+            }
+        }, currentHour, currentMin, false);
 
-                    }
-                }, 12, 0, false
-        );
         Objects.requireNonNull(timePickerDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         timePickerDialog.show();
     }
+
 
     /*
      * A function use to open DatePickerDialog
      * */
     private void showDatePickerDialog() {
         Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
+        mYear = cal.get(Calendar.YEAR);
+        mMonth = cal.get(Calendar.MONTH);
+        mDay = cal.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog dialog = new DatePickerDialog(requireContext(), android.R.style.Theme_Holo_Light_Dialog, new DatePickerDialog.OnDateSetListener() {
             @SuppressLint("SimpleDateFormat")
@@ -267,17 +323,19 @@ public class EditTripFragment extends Fragment {
                 int months = month + 1;
                 Date date = null;
                 try {
-                    date = new SimpleDateFormat("dd/MM/yyyy").parse(months + "/" + dayOfMonth + "/" + year);
+                    date = new SimpleDateFormat("dd/MM/yyyy").parse(dayOfMonth + "/" + months + "/" + year);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 if (date != null) {
                     binding.editTripEdTxtVwTripDate.setText(new SimpleDateFormat("dd / MM / yyyy").format(date));
-                    dateInMilliseconds = date.getTime();
                 }
+                mYear = year;
+                mMonth = month;
+                mDay = dayOfMonth;
 
             }
-        }, year, month, day);
+        }, mYear, mMonth, mDay);
 
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();

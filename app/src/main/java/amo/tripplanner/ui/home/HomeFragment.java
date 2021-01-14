@@ -85,6 +85,7 @@ public class HomeFragment extends Fragment {
         return bindingHome.getRoot();
     }
 
+
     private void deleteItemBySwabbing() {
         // Delete subject by swabbing item left and right
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {

@@ -13,6 +13,7 @@ import amo.tripplanner.database.converter.ConverterLocation;
 import amo.tripplanner.database.converter.ConverterNote;
 import amo.tripplanner.database.dao.TripDao;
 import amo.tripplanner.pojo.Trip;
+import timber.log.Timber;
 
 @Database(entities = {Trip.class}, version = 1, exportSchema = false)
 @TypeConverters({ConverterLocation.class, ConverterNote.class, ConverterDate.class})
@@ -26,7 +27,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public static AppDatabase getInstance(Context context) {
         if (mInstance == null) {
             synchronized (LOCK) {
-                Log.d(TAG, "getInstance: Creating a new database instance");
+                Timber.d("getInstance: Creating a new database instance");
                 mInstance = Room.databaseBuilder(
                         context.getApplicationContext(),
                         AppDatabase.class,
@@ -35,7 +36,7 @@ public abstract class AppDatabase extends RoomDatabase {
                         .build();
             }
         }
-        Log.d(TAG, "getInstance: Getting the database instance, no need to recreated it.");
+        Timber.d("getInstance: Getting the database instance, no need to recreated it.");
         return mInstance;
     }
 

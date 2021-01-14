@@ -14,9 +14,6 @@
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
         <action
-            android:id="@+id/action_loginFragment_to_tripDetailsFragment"
-            app:destination="@id/tripDetailsFragment" />
-        <action
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
@@ -25,10 +22,6 @@
         android:name="amo.tripplanner.ui.login.SignUpFragment"
         android:label="fragment_sign_up"
         tools:layout="@layout/fragment_sign_up" />
-    <fragment
-        android:id="@+id/tripDetailsFragment"
-        android:name="amo.tripplanner.ui.home.TripDetailsFragment"
-        android:label="TripDetailsFragment" />
     <fragment
         android:id="@+id/splashFragment"
         android:name="amo.tripplanner.ui.SplashFragment"
@@ -47,14 +40,14 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
-            android:id="@+id/action_homeFragment_to_tripDetailsFragment"
-            app:destination="@id/tripDetailsFragment" />
-        <action
             android:id="@+id/action_homeFragment_to_addFragmentFragment"
             app:destination="@id/addFragmentFragment" />
         <action
             android:id="@+id/action_homeFragment_to_editTripFragment"
             app:destination="@id/editTripFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_noteFragment"
+            app:destination="@id/noteFragment" />
     </fragment>
     <fragment
         android:id="@+id/addFragmentFragment"
@@ -104,4 +97,8 @@
             app:nullable="true"
             android:defaultValue="deafult" />
     </fragment>
+    <fragment
+        android:id="@+id/noteFragment"
+        android:name="amo.tripplanner.ui.home.NoteFragment"
+        android:label="NoteFragment" />
 </navigation>

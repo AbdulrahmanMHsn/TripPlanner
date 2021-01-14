@@ -91,6 +91,13 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
             }
         });
 
+        holder.itemBinding.itemImgTripNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_noteFragment);
+            }
+        });
+
     }
 
 

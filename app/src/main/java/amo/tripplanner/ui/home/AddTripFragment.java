@@ -2,11 +2,14 @@ package amo.tripplanner.ui.home;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 
 
@@ -18,6 +21,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +41,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete;
 import com.mapbox.mapboxsdk.plugins.places.autocomplete.model.PlaceOptions;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -47,23 +52,32 @@ import amo.tripplanner.R;
 import amo.tripplanner.databinding.LayoutAddFragmentBinding;
 import amo.tripplanner.pojo.Location;
 import amo.tripplanner.pojo.Trip;
+import amo.tripplanner.reciver.AlarmRciever;
+import amo.tripplanner.ui.MainActivity;
 import amo.tripplanner.viewmodel.TripListViewModel;
+
+import static android.content.Context.ALARM_SERVICE;
 
 
 public class AddTripFragment extends Fragment {
 
     //vars
     public static final String TAG = "AddFragment";
-    private long timeInMilliseconds;
-    private long dateInMilliseconds;
     private boolean isStart;
-    private String[] repeats = { "No Repeat", "Repeat Daily", "Repeat Monthly", "Repeat Weekly"};
+    private String[] repeats = {"No Repeat", "Repeat Daily", "Repeat Monthly", "Repeat Weekly"};
+    Calendar currentCalendar = Calendar.getInstance();
+
+    //Alarm
+    AlarmManager alarmManager;
+    private int notificationId = 1;
+    private int mYear, mMonth, mDay, currentHour, currentMin;
+    private String amPm;
 
     //vars trip
     private String tripName;
-    private String startAddress , endAddress;
-    private double startLatitude , startLongitude;
-    private double endLatitude , endLongitude;
+    private String startAddress, endAddress;
+    private double startLatitude, startLongitude;
+    private double endLatitude, endLongitude;
     private long timestamp;
     private String tripStatus = "Upcoming";
     private boolean tripIsRound = false;
@@ -83,11 +97,11 @@ public class AddTripFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        alarmManager = (AlarmManager) requireActivity().getSystemService(ALARM_SERVICE);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_add_fragment, container, false);
 
@@ -98,6 +112,130 @@ public class AddTripFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // choose start location trip
+        binding.addTripEdTxtVwTripStartPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToAutoComplete();
+                isStart = true;
+            }
+        });
+
+
+        // choose end location trip
+        binding.addTripEdTxtVwTripEndPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToAutoComplete();
+            }
+        });
+
+
+        // choose date trip
+        binding.addTripEdTxtVwTripDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog();
+            }
+        });
+
+
+        // choose time trip
+        binding.addTripEdTxtVwTripTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePickerDialog();
+            }
+        });
+
+
+        // add trip
+        binding.addTripBtnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.YEAR, mYear);
+                calendar.set(Calendar.MONTH, mMonth);
+                calendar.set(Calendar.DAY_OF_MONTH, mDay);
+                calendar.set(Calendar.HOUR_OF_DAY, currentHour);
+                calendar.set(Calendar.MINUTE, currentMin);
+                calendar.set(Calendar.SECOND, 0);
+                timestamp = calendar.getTimeInMillis();
+
+                if (binding.addTripEdTxtVwTripName.getText().toString().isEmpty()) {
+                    binding.addTripEdTxtVwTripName.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (binding.addTripEdTxtVwTripStartPoint.getText().toString().isEmpty()) {
+                    binding.addTripEdTxtVwTripStartPoint.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (binding.addTripEdTxtVwTripEndPoint.getText().toString().isEmpty()) {
+                    binding.addTripEdTxtVwTripEndPoint.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (binding.addTripEdTxtVwTripDate.getText().toString().isEmpty()) {
+                    binding.addTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (binding.addTripEdTxtVwTripTime.getText().toString().isEmpty()) {
+                    binding.addTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+                if (timestamp < currentCalendar.getTimeInMillis()) {
+                    binding.addTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);
+                    binding.addTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);
+                    return;
+                }
+
+
+                tripName = binding.addTripEdTxtVwTripName.getText().toString();
+
+
+                Location startLocation = new Location(startAddress, startLatitude, startLongitude);
+                Location endLocation = new Location(endAddress, endLatitude, endLongitude);
+
+                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat);
+                insertTrip(trip);
+                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
+
+            }
+        });
+
+
+        // navigating to home fragment
+        binding.addTripBtnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
+            }
+        });
+
+
+        // navigating to home fragment
+        binding.addTripImgBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
+            }
+        });
+
+
+        binding.addTripChBoxRounded.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                tripIsRound = isChecked;
+            }
+        });
 
 
         binding.addTripSpnChoose.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -113,144 +251,89 @@ public class AddTripFragment extends Fragment {
         });
 
         //Creating the ArrayAdapter instance having the country list
-        ArrayAdapter aa = new ArrayAdapter(getContext(),android.R.layout.simple_spinner_item,repeats);
+        ArrayAdapter aa = new ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, repeats);
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //Setting the ArrayAdapter data on the Spinner
         binding.addTripSpnChoose.setAdapter(aa);
-
-        // choose start location trip
-        binding.addTripEdTxtVwTripStartPoint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToAutoComplete();
-                isStart = true;
-
-            }
-        });
-
-
-        binding.addTripChBoxRounded.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                tripIsRound = isChecked;
-            }
-        });
-
-        // choose end location trip
-        binding.addTripEdTxtVwTripEndPoint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToAutoComplete();
-            }
-        });
-
-        // choose date trip
-        binding.addTripEdTxtVwTripDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog();
-            }
-        });
-
-        // choose time trip
-        binding.addTripEdTxtVwTripTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTimePickerDialog();
-            }
-        });
-
-        // add trip
-        binding.addTripBtnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tripName = binding.addTripEdTxtVwTripName.getText().toString();
-                timestamp = timeInMilliseconds + dateInMilliseconds;
-
-                Location startLocation = new Location(startAddress,startLatitude,startLongitude);
-                Location endLocation = new Location(endAddress,endLatitude,endLongitude);
-
-                Trip trip = new Trip(tripName,startLocation,endLocation,timestamp,tripStatus,tripIsRound,tripRepeat);
-                insertTrip(trip);
-                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
-            }
-        });
-
-        binding.addTripBtnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
-            }
-        });
-
-        binding.addTripImgBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
-            }
-        });
-
     }
 
 
     /*
      * A function use to insert trip within room database
      * */
-    private void insertTrip(Trip trip){
+    private void insertTrip(Trip trip) {
         // call observe
         TripListViewModel listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
         listViewModel.insert(trip);
+        Log.i(TAG, "onClick: trip.getTripId() : "+trip.getTripName());
+        turnAlarmManager(timestamp,trip.getTripId());
     }
+
+
+    /*
+     * A function use to create reminder
+     * */
+    private void turnAlarmManager(long timestamp,int tripId) {
+        Intent intent = new Intent(requireContext(), AlarmRciever.class);
+        intent.putExtra("notificationId", notificationId);
+        intent.putExtra("Message", "editText.getText().toString()");
+
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), tripId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
+        }
+
+    }
+
 
     /*
      * A function use to open TimePickerDialog
      * */
     private void showTimePickerDialog() {
-        Calendar cal = Calendar.getInstance();
-        int hour = cal.get(Calendar.HOUR);
-        int minute = cal.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), android.R.style.Theme_Holo_Light_Dialog,
-                new TimePickerDialog.OnTimeSetListener() {
-                    @SuppressLint("SimpleDateFormat")
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        currentMin = calendar.get(Calendar.MINUTE);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), android.R.style.Theme_Holo_Light_Dialog, new TimePickerDialog.OnTimeSetListener() {
+            @SuppressLint({"SetTextI18n", "DefaultLocale"})
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                if (hourOfDay >= 12) {
+                    amPm = "PM";
+                } else {
+                    amPm = "AM";
+                }
+                binding.addTripEdTxtVwTripTime.setText(String.format("%02d : %02d ", hourOfDay, minute) + amPm);
+                currentHour = hourOfDay;
+                currentMin = minute;
 
-                        Date date = null;
-                        try {
-                            date = new SimpleDateFormat("HH:mm aa").parse(hourOfDay + ":" + minute);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+            }
+        }, currentHour, currentMin, false);
 
-                        if (date != null) {
-                            binding.addTripEdTxtVwTripTime.setText(new SimpleDateFormat("hh : mm aa").format(date));
-                            timeInMilliseconds = date.getTime();
-                        }
-
-                    }
-                }, hour, minute, false
-        );
         Objects.requireNonNull(timePickerDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         timePickerDialog.show();
     }
+
 
     /*
      * A function use to open DatePickerDialog
      * */
     private void showDatePickerDialog() {
         Calendar cal = Calendar.getInstance();
-        int mYear = cal.get(Calendar.YEAR);
-        int mMonth = cal.get(Calendar.MONTH);
-        int mDay = cal.get(Calendar.DAY_OF_MONTH);
+        mYear = cal.get(Calendar.YEAR);
+        mMonth = cal.get(Calendar.MONTH);
+        mDay = cal.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog dialog = new DatePickerDialog(requireContext(), android.R.style.Theme_Holo_Light_Dialog, new DatePickerDialog.OnDateSetListener() {
             @SuppressLint("SimpleDateFormat")
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                int months= month+1;
+                int months = month + 1;
                 Date date = null;
                 try {
                     date = new SimpleDateFormat("dd/MM/yyyy").parse(dayOfMonth + "/" + months + "/" + year);
@@ -259,8 +342,10 @@ public class AddTripFragment extends Fragment {
                 }
                 if (date != null) {
                     binding.addTripEdTxtVwTripDate.setText(new SimpleDateFormat("dd / MM / yyyy").format(date));
-                    dateInMilliseconds = date.getTime();
                 }
+                mYear = year;
+                mMonth = month;
+                mDay = dayOfMonth;
 
             }
         }, mYear, mMonth, mDay);
@@ -268,6 +353,7 @@ public class AddTripFragment extends Fragment {
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
     }
+
 
     /*
      * A function use to open Fragment PlaceAutocomplete
@@ -308,9 +394,6 @@ public class AddTripFragment extends Fragment {
                 endLongitude = latLng.getLongitude();
                 binding.addTripEdTxtVwTripEndPoint.setText(endAddress);
             }
-
-
-
 
 
             Toast.makeText(getContext(), latLng.getLatitude() + "  " + latLng.getLongitude(), Toast.LENGTH_SHORT).show();
