@@ -2,6 +2,7 @@ package amo.tripplanner.Helper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,14 +17,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 import amo.tripplanner.R;
+import amo.tripplanner.pojo.Trip;
 
 public class FirebaseHelper {
 
     private Context context;
 
+    private static final String TAG = "FirebaseHelper";
 
     public static FirebaseHelper firebaseHelper;
 
@@ -32,7 +36,6 @@ public class FirebaseHelper {
     public static FirebaseDatabase mDatabase;
 
     public static DatabaseReference mDatabaseReference;
-
 
 
     public FirebaseHelper(Context context) {
@@ -50,6 +53,7 @@ public class FirebaseHelper {
 
 
     }
+
 
     public static void initFireBase() {
 
@@ -102,11 +106,37 @@ public class FirebaseHelper {
                                             }
                                         }
                                     });
-                        } else {
-
                         }
                     }
                 });
+    }
+
+
+    public void syncWithBackend(List<Trip> trips){
+
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("user").child("g5xu0caoaJMDU0Rm8mdkSNNnE2k2").child("trips");
+
+        rootRef.setValue(trips).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if(!task.isSuccessful()){
+                    Log.i(TAG, "onComplete: failed");
+                }
+                
+            }
+        });
+
+    }
+
+
+    public String getCurrentUserId() {
+        return Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+    }
+
+
+    public String getCurrentUserEmail() {
+        return Objects.requireNonNull(mAuth.getCurrentUser()).getEmail();
     }
 
 

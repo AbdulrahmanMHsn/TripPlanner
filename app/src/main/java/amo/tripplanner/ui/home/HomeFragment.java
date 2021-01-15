@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -25,6 +26,7 @@ import com.shrikanthravi.customnavigationdrawer2.widget.SNavigationDrawer;
 import java.util.ArrayList;
 import java.util.List;
 
+import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.adapter.TripListAdapter;
 import amo.tripplanner.databinding.FragmentHomeBinding;
@@ -44,6 +46,8 @@ public class HomeFragment extends Fragment {
 
     //Global Declaration
     private SNavigationDrawer sNavigationDrawer;
+
+    private List<Trip> tripList = new ArrayList<>();
 
     public HomeFragment() {
         // Required empty public constructor
@@ -72,11 +76,23 @@ public class HomeFragment extends Fragment {
         bindingHome.idRecyclerView.setAdapter(adapter);
 
         listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
-        listViewModel.getAllTrips().observe(getViewLifecycleOwner(), trips -> adapter.setTrips(trips));
+        listViewModel.getAllTrips().observe(getViewLifecycleOwner(), new Observer<List<Trip>>() {
+            @Override
+            public void onChanged(List<Trip> trips) {
+                tripList = trips;
+                adapter.setTrips(tripList);
+            }
+        });
 
         deleteItemBySwabbing();
 
-        bindingHome.idBtnAddTrip.setOnClickListener(v -> Navigation.findNavController(container).navigate(R.id.action_homeFragment_to_addFragmentFragment));
+//        bindingHome.idBtnAddTrip.setOnClickListener(v -> Navigation.findNavController(container).navigate(R.id.action_homeFragment_to_addFragmentFragment));
+        bindingHome.idBtnAddTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseHelper.getInstance(requireContext()).syncWithBackend(tripList);
+            }
+        });
 
         return bindingHome.getRoot();
     }
