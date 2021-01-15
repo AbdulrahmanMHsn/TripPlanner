@@ -3,6 +3,7 @@ package amo.tripplanner.ui.login;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -41,6 +42,7 @@ public class LoginFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
 
+        onBackPressed();
 
         binding.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,5 +86,15 @@ public class LoginFragment extends Fragment {
             binding.layoutPassword.setBackgroundResource(R.drawable.background_input_empty);
         }
 
+    }
+
+    private void onBackPressed(){
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                requireActivity().finish();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);
     }
 }

@@ -38,6 +38,8 @@
         android:id="@+id/homeFragment"
         android:name="amo.tripplanner.ui.home.HomeFragment"
         android:label="fragment_home"
+        app:enterAnim="@android:anim/fade_in"
+        app:exitAnim="@android:anim/fade_out"
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_homeFragment_to_addFragmentFragment"
@@ -101,9 +103,6 @@
         android:id="@+id/noteFragment"
         android:name="amo.tripplanner.ui.home.NoteFragment"
         android:label="NoteFragment" >
-        <action
-            android:id="@+id/action_noteFragment_to_addNoteFragment"
-            app:destination="@id/addNoteFragment" />
         <argument
             android:name="id"
             app:argType="integer"
@@ -111,17 +110,5 @@
         <action
             android:id="@+id/action_noteFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/addNoteFragment"
-        android:name="amo.tripplanner.ui.home.AddNoteFragment"
-        android:label="AddNoteFragment" >
-        <argument
-            android:name="id"
-            app:argType="integer"
-            android:defaultValue="0" />
-        <action
-            android:id="@+id/action_addNoteFragment_to_noteFragment"
-            app:destination="@id/noteFragment" />
     </fragment>
 </navigation>

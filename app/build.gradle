@@ -75,5 +75,8 @@ dependencies {
     //Mab box
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-places-v9:0.12.0'
 
+    //Navigation-Drawer
+    implementation 'com.github.shrikanth7698:Custom-Navigation-Drawer:v0.0.1'
+
 
 }

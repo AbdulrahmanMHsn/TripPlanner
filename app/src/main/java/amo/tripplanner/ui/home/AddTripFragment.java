@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -103,6 +104,8 @@ public class AddTripFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_add_trip, container, false);
 
+        onBackPressed();
+
         return binding.getRoot();
     }
 
@@ -164,32 +167,39 @@ public class AddTripFragment extends Fragment {
 
                 if (binding.addTripEdTxtVwTripName.getText().toString().isEmpty()) {
                     binding.addTripEdTxtVwTripName.setBackgroundResource(R.drawable.background_input_empty);
+                    binding.addTripEdTxtVwTripName.setError(getString(R.string.name_required));
                     return;
                 }
 
                 if (binding.addTripEdTxtVwTripStartPoint.getText().toString().isEmpty()) {
                     binding.addTripEdTxtVwTripStartPoint.setBackgroundResource(R.drawable.background_input_empty);
+                    binding.addTripEdTxtVwTripStartPoint.setError(getString(R.string.startPoint_required));
                     return;
                 }
 
                 if (binding.addTripEdTxtVwTripEndPoint.getText().toString().isEmpty()) {
                     binding.addTripEdTxtVwTripEndPoint.setBackgroundResource(R.drawable.background_input_empty);
+                    binding.addTripEdTxtVwTripEndPoint.setError(getString(R.string.endPoint_required));
                     return;
                 }
 
                 if (binding.addTripEdTxtVwTripDate.getText().toString().isEmpty()) {
                     binding.addTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);
+                    binding.addTripEdTxtVwTripDate.setError(getString(R.string.date_required));
                     return;
                 }
 
                 if (binding.addTripEdTxtVwTripTime.getText().toString().isEmpty()) {
                     binding.addTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);
+                    binding.addTripEdTxtVwTripTime.setError(getString(R.string.time_required));
                     return;
                 }
 
                 if (timestamp < currentCalendar.getTimeInMillis()) {
                     binding.addTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);
                     binding.addTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);
+                    binding.addTripEdTxtVwTripTime.setError(getString(R.string.time_expired));
+                    binding.addTripEdTxtVwTripDate.setError(getString(R.string.date_expired));
                     return;
                 }
 
@@ -264,7 +274,6 @@ public class AddTripFragment extends Fragment {
         // call observe
         TripListViewModel listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
         listViewModel.insert(trip);
-        Log.i(TAG, "onClick: trip.getTripId() : "+trip.getTripName());
         turnAlarmManager(timestamp,trip.getTripId());
     }
 
@@ -272,7 +281,8 @@ public class AddTripFragment extends Fragment {
     /*
      * A function use to create reminder
      * */
-    private void turnAlarmManager(long timestamp,int tripId) {
+    @SuppressLint("ObsoleteSdkInt")
+    private void turnAlarmManager(long timestamp, int tripId) {
         Intent intent = new Intent(requireContext(), AlarmRciever.class);
         intent.putExtra("notificationId", notificationId);
         intent.putExtra("Message", "editText.getText().toString()");
@@ -398,5 +408,15 @@ public class AddTripFragment extends Fragment {
             Toast.makeText(getContext(), latLng.getLatitude() + "  " + latLng.getLongitude(), Toast.LENGTH_SHORT).show();
 
         }
+    }
+
+    private void onBackPressed(){
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Navigation.findNavController(getView()).navigate(R.id.action_addFragmentFragment_to_homeFragment);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);
     }
 }

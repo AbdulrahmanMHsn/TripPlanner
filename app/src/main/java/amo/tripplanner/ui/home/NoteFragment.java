@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -76,6 +77,8 @@ public class NoteFragment extends Fragment {
         });
 
         bindingNote.noteBtnAdd.setOnClickListener(v -> insertNoteToTrip());
+
+        bindingNote.noteImgClose.setOnClickListener(v-> Navigation.findNavController(container).navigate(R.id.action_noteFragment_to_homeFragment));
 
         return bindingNote.getRoot();
     }

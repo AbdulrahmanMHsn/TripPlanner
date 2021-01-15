@@ -3,51 +3,47 @@ package amo.tripplanner.ui.home;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.google.firebase.database.DatabaseReference;
 import com.mapbox.mapboxsdk.Mapbox;
-
+import com.shrikanthravi.customnavigationdrawer2.data.MenuItem;
+import com.shrikanthravi.customnavigationdrawer2.widget.SNavigationDrawer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import amo.tripplanner.R;
 import amo.tripplanner.adapter.TripListAdapter;
 import amo.tripplanner.databinding.FragmentHomeBinding;
 import amo.tripplanner.pojo.Trip;
 import amo.tripplanner.viewmodel.TripListViewModel;
+import timber.log.Timber;
 
 
 public class HomeFragment extends Fragment {
 
 
-    private static final String TAG = "HomeFragment";
-    FragmentHomeBinding bindingHome;
+    private FragmentHomeBinding bindingHome;
 
-    private RecyclerView recyclerView;
     private TripListAdapter adapter;
-    View view;
 
-    DatabaseReference reference;
-    List<Trip> list = new ArrayList<>();
-    TripListViewModel listViewModel;
+    private TripListViewModel listViewModel;
 
+    //Global Declaration
+    private SNavigationDrawer sNavigationDrawer;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -56,15 +52,19 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate: started.");
-        Mapbox.getInstance(getContext(), getString(R.string.access_token));
+        Timber.i("onCreate: started.");
+
+
+        Mapbox.getInstance(requireContext(), getString(R.string.access_token));
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
 
         bindingHome = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
+
+        onBackPressed();
 
         bindingHome.idRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -72,26 +72,104 @@ public class HomeFragment extends Fragment {
         bindingHome.idRecyclerView.setAdapter(adapter);
 
         listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
-        listViewModel.getAllTrips().observe(getViewLifecycleOwner(), new Observer<List<Trip>>() {
-            @Override
-            public void onChanged(List<Trip> trips) {
-                Log.i(TAG, "onChanged: List<Trip> trips"+trips.size());
-                adapter.setTrips(trips);
-            }
-        });
+        listViewModel.getAllTrips().observe(getViewLifecycleOwner(), trips -> adapter.setTrips(trips));
 
         deleteItemBySwabbing();
 
-        bindingHome.idBtnAddTrip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(container).navigate(R.id.action_homeFragment_to_addFragmentFragment);
-            }
-        });
+        bindingHome.idBtnAddTrip.setOnClickListener(v -> Navigation.findNavController(container).navigate(R.id.action_homeFragment_to_addFragmentFragment));
 
         return bindingHome.getRoot();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        sNavigationDrawer = view.findViewById(R.id.navigationDrawer);
+//        sNavigationDrawer.setMenu
+
+        bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(v -> sNavigationDrawer.openDrawer());
+
+        //Creating a list of menu Items
+
+        List<MenuItem> menuItems = new ArrayList<>();
+
+        //Use the MenuItem given by this library and not the default one.
+        //First parameter is the title of the menu item and then the second parameter is the image which will be the background of the menu item.
+
+        menuItems.add(new MenuItem("News", R.drawable.arrow_left));
+        menuItems.add(new MenuItem("Feed", R.drawable.arrow_left));
+        menuItems.add(new MenuItem("Messages", R.drawable.arrow_left));
+        menuItems.add(new MenuItem("Music", R.drawable.arrow_left));
+
+        //then add them to navigation drawer
+
+        sNavigationDrawer.setMenuItemList(menuItems);
+        sNavigationDrawer.setScrollBarSize(0);
+
+        //Listener to handle the menu item click. It returns the position of the menu item clicked. Based on that you can switch between the fragments.
+
+//        sNavigationDrawer.setOnMenuItemClickListener(new SNavigationDrawer.OnMenuItemClickListener() {
+//            @Override
+//            public void onMenuItemClicked(int position) {
+//                System.out.println("Position " + position);
+
+//                switch (position) {
+//                    case 0: {
+//                        fragmentClass = NewsFragment.class;
+//                        break;
+//                    }
+//                    case 1: {
+//                        fragmentClass = FeedFragment.class;
+//                        break;
+//                    }
+//                    case 2: {
+//                        fragmentClass = MessagesFragment.class;
+//                        break;
+//                    }
+//                    case 3: {
+//                        fragmentClass = MusicFragment.class;
+//                        break;
+//                    }
+//
+//                }
+
+//                //Listener for drawer events such as opening and closing.
+//                sNavigationDrawer.setDrawerListener(new SNavigationDrawer.DrawerListener() {
+//
+//                    @Override
+//                    public void onDrawerOpened() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onDrawerOpening() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onDrawerClosing() {
+//                        System.out.println("Drawer closed");
+//
+////                       Navigation.findNavController(view).navigate(R.id.);
+////                        fragmentManager.beginTransaction().setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out).replace(R.id.frameLayout, fragment).commit();
+//
+//
+//                    }
+//
+//                    @Override
+//                    public void onDrawerClosed() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onDrawerStateChanged(int newState) {
+//                        System.out.println("State " + newState);
+//                    }
+//                });
+//            }
+//        });
+    }
 
     private void deleteItemBySwabbing() {
         // Delete subject by swabbing item left and right
@@ -110,6 +188,17 @@ public class HomeFragment extends Fragment {
             }
         });
         itemTouchHelper.attachToRecyclerView(bindingHome.idRecyclerView);
+    }
+
+
+    private void onBackPressed() {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                requireActivity().finish();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);
     }
 
 

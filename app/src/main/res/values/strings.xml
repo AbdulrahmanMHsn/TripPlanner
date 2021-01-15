@@ -40,7 +40,7 @@
     <string name="todo">ToDo</string>
     <string name="start">Start</string>
     <string name="menu">menu</string>
-    <string name="mytrips">My recent trips</string>
+    <string name="mytrips">Trips</string>
     <string name="search_trip">Search Trip</string>
     <string name="tripTime">Time</string>
     <string name="rounded_direction">Round Trip</string>
@@ -58,6 +58,14 @@
     <string name="reset">reset</string>
     <string name="add">add</string>
     <string name="text_empty">Text is empty</string>
+    <string name="name_required">name is required</string>
+    <string name="date_expired">Date is expired</string>
+    <string name="time_expired">Time is expired</string>
+    <string name="time_required">Time is required</string>
+    <string name="date_required">Date is required</string>
+    <string name="endPoint_required">EndPoint is required</string>
+    <string name="startPoint_required">StartPoint is required</string>
+    <string name="add_trip">Add trip</string>
 
 
 </resources>
