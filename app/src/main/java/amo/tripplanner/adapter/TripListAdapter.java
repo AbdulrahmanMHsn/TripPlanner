@@ -2,6 +2,7 @@ package amo.tripplanner.adapter;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import amo.tripplanner.R;
 import amo.tripplanner.databinding.ItemTripBinding;
 import amo.tripplanner.databinding.TripsItemBinding;
 import amo.tripplanner.pojo.Trip;
+import amo.tripplanner.service.FloatingWidgetService;
 import amo.tripplanner.ui.home.HomeFragmentDirections;
 
 public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripViewHolder> {
@@ -88,6 +90,14 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
                 if (position != RecyclerView.NO_POSITION) {
                     mListener.onItemClick(position);
                 }
+            }
+        });
+
+        holder.itemBinding.itemBtnStartTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 =new Intent(v.getContext(), FloatingWidgetService.class);
+                v.getContext().startService(intent1);
             }
         });
 
