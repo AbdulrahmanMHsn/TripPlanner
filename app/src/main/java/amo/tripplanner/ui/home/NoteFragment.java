@@ -2,19 +2,16 @@ package amo.tripplanner.ui.home;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 
 
 import java.util.ArrayList;
@@ -24,18 +21,15 @@ import amo.tripplanner.R;
 import amo.tripplanner.adapter.NoteListAdapter;
 import amo.tripplanner.databinding.FragmentNoteBinding;
 import amo.tripplanner.pojo.Note;
-import amo.tripplanner.pojo.Trip;
 import amo.tripplanner.viewmodel.TripListViewModel;
 
 public class NoteFragment extends Fragment {
 
-    private static final String TAG = "HomeFragment";
     private FragmentNoteBinding bindingNote;
     private List<Note> list = new ArrayList<>();
-    private RecyclerView recyclerView;
     private NoteListAdapter adapter;
     private int id;
-
+    private TripListViewModel listViewModels;
 
 
     public NoteFragment() {
@@ -43,10 +37,11 @@ public class NoteFragment extends Fragment {
     }
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+         listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
         if (getArguments() != null) {
             NoteFragmentArgs  args = NoteFragmentArgs.fromBundle(getArguments());
             id = args.getId();
@@ -56,7 +51,7 @@ public class NoteFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         bindingNote = DataBindingUtil.inflate(inflater, R.layout.fragment_note, container, false);
@@ -67,18 +62,29 @@ public class NoteFragment extends Fragment {
 
         bindingNote.recyclerView.setAdapter(adapter);
 
-        TripListViewModel listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
-        listViewModels.getSubjectById(id).observe(getViewLifecycleOwner(), new Observer<Trip>() {
+
+        listViewModels.getSubjectById(id).observe(getViewLifecycleOwner(), trip -> {
+            list = trip.getTripNotes();
+            adapter.setNotes(list);
+        });
+
+        adapter.setOnItemClickListener(new NoteListAdapter.OnItemClickListener() {
             @Override
-            public void onChanged(Trip trip) {
-                list = trip.getTripNotes();
-                adapter.setNotes(list);
+            public void onItemDeleteClick(int position) {
+                list.remove(position);
+                listViewModels.deleteItemNote(id,list);
+            }
+
+            @Override
+            public void onItemChecked(int position) {
+                list.get(position).setChecked(true);
+                listViewModels.update(id,list);
             }
         });
 
         bindingNote.noteBtnAdd.setOnClickListener(v -> insertNoteToTrip());
 
-        bindingNote.noteImgClose.setOnClickListener(v-> Navigation.findNavController(container).navigate(R.id.action_noteFragment_to_homeFragment));
+        bindingNote.noteImgClose.setOnClickListener(v-> Navigation.findNavController(container).popBackStack());
 
         return bindingNote.getRoot();
     }
@@ -97,8 +103,7 @@ public class NoteFragment extends Fragment {
         list.add(new Note(body));
 
         // call observe
-        TripListViewModel listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
-        listViewModel.update(id,list);
+        listViewModels.update(id,list);
         bindingNote.noteEdTxtVwBody.setText("");
     }
 }

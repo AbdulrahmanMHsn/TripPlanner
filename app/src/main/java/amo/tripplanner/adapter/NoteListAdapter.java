@@ -1,29 +1,22 @@
 package amo.tripplanner.adapter;
 
-
 import android.annotation.SuppressLint;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.ItemNoteBinding;
-import amo.tripplanner.databinding.TripsItemBinding;
 import amo.tripplanner.pojo.Note;
-import amo.tripplanner.pojo.Trip;
-import amo.tripplanner.ui.home.HomeFragmentDirections;
+
 
 public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteViewHolder> {
 
@@ -31,11 +24,12 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
     private List<Note> notes = new ArrayList<>();
 
     private OnItemClickListener mListener;
-    private View view;
     private ItemNoteBinding itemBinding;
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemDeleteClick(int position);
+
+        void onItemChecked(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -48,10 +42,9 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        view = parent;
         itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_note, parent, false);
 
-        return new NoteViewHolder(itemBinding);
+        return new NoteViewHolder(itemBinding, mListener);
     }
 
     @SuppressLint("LogNotTimber")
@@ -65,13 +58,15 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
         Note note = notes.get(position);
         itemBinding.itemNoteTxtVwBody.setText(note.getBody());
 
-        itemBinding.itemNoteImgDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(view.getContext(), position + "", Toast.LENGTH_SHORT).show();
-            }
-        });
-
+//        itemBinding.itemNoteImgDelete.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(v.getContext(), position + "", Toast.LENGTH_SHORT).show();
+//                notes.remove(position);
+//                TripListViewModel listViewModels = ViewModelProviders.of((FragmentActivity) view.getContext()).get(TripListViewModel.class);
+//                listViewModels.deleteItemNote(1, notes);
+//            }
+//        });
     }
 
 
@@ -82,7 +77,6 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
 
     @Override
     public int getItemCount() {
-        Log.i(TAG, "getItemCount: "+notes.size());
         if (notes.size() != 0)
             return notes.size();
         else
@@ -104,9 +98,27 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
     static class NoteViewHolder extends RecyclerView.ViewHolder {
         ItemNoteBinding itemBinding;
 
-        public NoteViewHolder(@NonNull ItemNoteBinding itemBinding) {
+        public NoteViewHolder(@NonNull ItemNoteBinding itemBinding, final OnItemClickListener listener) {
             super(itemBinding.getRoot());
             this.itemBinding = itemBinding;
+
+            itemBinding.itemNoteImgDelete.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemDeleteClick(position);
+                    }
+                }
+            });
+
+            itemBinding.itemNoteChBoxCompleted.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemChecked(position);
+                    }
+                }
+            });
         }
 
     }

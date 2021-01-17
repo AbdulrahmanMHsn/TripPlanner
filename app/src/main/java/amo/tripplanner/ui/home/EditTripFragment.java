@@ -243,7 +243,7 @@ public class EditTripFragment extends Fragment {
                 Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat);
                 trip.setTripId(id);
                 updateTrip(trip);
-                Navigation.findNavController(view).navigate(R.id.action_editTripFragment_to_homeFragment);
+                Navigation.findNavController(view).popBackStack();
             }
         });
 
@@ -252,14 +252,14 @@ public class EditTripFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Navigation.findNavController(view).navigate(R.id.action_editTripFragment_to_homeFragment);
+                Navigation.findNavController(view).popBackStack();
             }
         });
 
         binding.editTripImgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(view).navigate(R.id.action_editTripFragment_to_homeFragment);
+                Navigation.findNavController(view).popBackStack();
             }
         });
 

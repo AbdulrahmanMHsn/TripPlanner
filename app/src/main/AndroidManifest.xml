@@ -4,6 +4,15 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="10" />
+
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
 
     <application
         android:allowBackup="true"
@@ -12,8 +21,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-<!--        <activity android:name=".ui.DailogActivity" android:theme="@style/Theme.Transparent"/>-->
-        <activity android:name=".ui.DailogActivity"/>
+        <activity android:name=".ui.DailogActivity" android:theme="@style/Theme.Transparent"/>
+<!--        <activity android:name=".ui.DailogActivity"/>-->
         <activity
             android:name=".ui.MainActivity"
             android:screenOrientation="locked">
@@ -24,12 +33,26 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".reciver.AlarmRciever" >
+        <receiver
+            android:name=".reciver.AlarmRciever"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="true">
 <!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
-<!--                <action android:name="android.intent.action.QUICKBOOT_POWERON" />-->
+<!--&lt;!&ndash;                <category android:name="android.intent.category.DEFAULT" />&ndash;&gt;-->
+<!--&lt;!&ndash;                <action&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:name="android.intent.action.LOCKED_BOOT_COMPLETED"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                <action&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:name="android.intent.action.ACTION_BOOT_COMPLETED"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                <action&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:name="android.intent.action.QUICKBOOT_BOWERON"/>&ndash;&gt;-->
 <!--            </intent-filter>-->
         </receiver>
+
+        <service android:name=".service.MyService"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":remote"/>
     </application>
 
 </manifest>

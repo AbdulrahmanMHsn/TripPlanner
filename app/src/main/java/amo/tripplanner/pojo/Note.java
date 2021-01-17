@@ -3,7 +3,7 @@ package amo.tripplanner.pojo;
 public class Note {
 
     private String body;
-//    private boolean isChecked;
+    private boolean isChecked;
 
 
     public Note(String body) {
@@ -15,20 +15,20 @@ public class Note {
     }
 
 
-//    public Note(String body, boolean isChecked) {
-//        this.body = body;
-//        this.isChecked = isChecked;
-//    }
-//
-//
-//    public boolean isChecked() {
-//        return isChecked;
-//    }
-//
-//
-//    public void setChecked(boolean checked) {
-//        isChecked = checked;
-//    }
+    public Note(String body, boolean isChecked) {
+        this.body = body;
+        this.isChecked = isChecked;
+    }
+
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
 
 
     public String getBody() {

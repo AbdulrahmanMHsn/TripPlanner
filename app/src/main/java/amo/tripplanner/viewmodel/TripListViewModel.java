@@ -43,6 +43,10 @@ public class TripListViewModel extends AndroidViewModel {
         mRepository.update(id,notes);
     }
 
+    public void deleteItemNote(int id,List<Note> notes) {
+        mRepository.update(id,notes);
+    }
+
     public void delete(Trip trip) {
         mRepository.delete(trip);
     }

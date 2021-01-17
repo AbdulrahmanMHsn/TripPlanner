@@ -211,9 +211,9 @@ public class AddTripFragment extends Fragment {
                 Location endLocation = new Location(endAddress, endLatitude, endLongitude);
                 List<Note> list = new ArrayList<>();
 
-                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat,list);
+                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list);
                 insertTrip(trip);
-                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
+                Navigation.findNavController(view).popBackStack();
 
             }
         });
@@ -224,7 +224,7 @@ public class AddTripFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
+                Navigation.findNavController(view).popBackStack();
             }
         });
 
@@ -234,7 +234,7 @@ public class AddTripFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Navigation.findNavController(view).navigate(R.id.action_addFragmentFragment_to_homeFragment);
+                Navigation.findNavController(view).popBackStack();
             }
         });
 
@@ -274,7 +274,7 @@ public class AddTripFragment extends Fragment {
         // call observe
         TripListViewModel listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
         listViewModel.insert(trip);
-        turnAlarmManager(timestamp,trip.getTripId());
+        turnAlarmManager(timestamp, trip.getTripId());
     }
 
 
@@ -285,9 +285,11 @@ public class AddTripFragment extends Fragment {
     private void turnAlarmManager(long timestamp, int tripId) {
         Intent intent = new Intent(requireContext(), AlarmRciever.class);
         intent.putExtra("notificationId", notificationId);
-        intent.putExtra("Message", "editText.getText().toString()");
+        intent.putExtra("Message", binding.addTripEdTxtVwTripName.getText());
 
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), tripId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+//        intent.putExtra("notificationId",notificationId);
+//        intent.putExtra("Message",binding.addTripEdTxtVwTripName.getText());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
@@ -410,11 +412,11 @@ public class AddTripFragment extends Fragment {
         }
     }
 
-    private void onBackPressed(){
+    private void onBackPressed() {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Navigation.findNavController(getView()).navigate(R.id.action_addFragmentFragment_to_homeFragment);
+                Navigation.findNavController(getView()).popBackStack();
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import amo.tripplanner.R;
+import amo.tripplanner.databinding.ItemTripBinding;
 import amo.tripplanner.databinding.TripsItemBinding;
 import amo.tripplanner.pojo.Trip;
 import amo.tripplanner.ui.home.HomeFragmentDirections;
@@ -45,7 +46,7 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
     @Override
     public TripViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         view = parent;
-        TripsItemBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.trips_item, parent, false);
+        ItemTripBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_trip, parent, false);
 
         return new TripViewHolder(itemBinding);
     }
@@ -125,9 +126,9 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
     }
 
     static class TripViewHolder extends RecyclerView.ViewHolder {
-        TripsItemBinding itemBinding;
+        ItemTripBinding itemBinding;
 
-        public TripViewHolder(@NonNull TripsItemBinding itemBinding) {
+        public TripViewHolder(@NonNull ItemTripBinding itemBinding) {
             super(itemBinding.getRoot());
             this.itemBinding = itemBinding;
         }

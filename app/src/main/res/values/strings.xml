@@ -35,7 +35,7 @@
     <string name="rponded_dir">Rounded Direction</string>
     <string name="trip_add">Add Trip</string>
     <string name="trips">Trips</string>
-    <string name="don_t_have_an_account_sign_up">Don\'t have an account? Sign Up</string>
+    <string name="don_t_have_an_account_sign_up">Do not have an account? Sign Up</string>
     <string name="ic_password">ic_password</string>
     <string name="todo">ToDo</string>
     <string name="start">Start</string>
@@ -67,5 +67,19 @@
     <string name="startPoint_required">StartPoint is required</string>
     <string name="add_trip">Add trip</string>
 
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 
+
+    <string name="account_balance">Account Balance</string>
+    <string name="balance_currency">$</string>
+    <string name="balance_amount">524.99</string>
+    <string name="or">OR</string>
+    <string name="login_social">login using social media</string>
+    <string name="todoo">TODO</string>
+    <string name="home">Home</string>
+    <string name="history">History</string>
+    <string name="sync">Sync</string>
+    <string name="setting">Setting</string>
+    <string name="logout">logout</string>
 </resources>

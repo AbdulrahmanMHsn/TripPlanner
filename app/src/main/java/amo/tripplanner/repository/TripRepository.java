@@ -75,6 +75,15 @@ public class TripRepository {
         });
     }
 
+    public void deleteItemNote(final int id,final List<Note> notes) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                tripDao.deleteItemNote(id,notes);
+            }
+        });
+    }
+
     public void delete(final Trip trip) {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override

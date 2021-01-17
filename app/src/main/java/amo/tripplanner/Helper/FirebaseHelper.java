@@ -29,14 +29,23 @@ public class FirebaseHelper {
 
     private static final String TAG = "FirebaseHelper";
 
-    public static FirebaseHelper firebaseHelper;
+    private static FirebaseHelper firebaseHelper;
 
-    public static FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
 
-    public static FirebaseDatabase mDatabase;
+    private FirebaseDatabase mDatabase;
 
-    public static DatabaseReference mDatabaseReference;
+    private DatabaseReference mDatabaseReference;
 
+    private String mUID;
+
+    public String getmUID() {
+        return mUID;
+    }
+
+    public void setmUID(String mUID) {
+        this.mUID = mUID;
+    }
 
     public FirebaseHelper(Context context) {
         this.context = context;
@@ -50,19 +59,16 @@ public class FirebaseHelper {
         } else {
             return firebaseHelper;
         }
-
-
     }
 
 
-    public static void initFireBase() {
-
-        //initializing firebase auth object
-        mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance();
-        mDatabaseReference = mDatabase.getReference();
-
-    }
+//    public static void initFireBase() {
+//
+//        //initializing firebase auth object
+//        mAuth = FirebaseAuth.getInstance();
+//        mDatabase = FirebaseDatabase.getInstance();
+//        mDatabaseReference = mDatabase.getReference();
+//    }
 
 
     public void userLogin(String email, String password, final Context context, final View view) {
@@ -112,7 +118,7 @@ public class FirebaseHelper {
     }
 
 
-    public void syncWithBackend(List<Trip> trips){
+    public void syncWithBackend(List<Trip> trips) {
 
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("user").child("g5xu0caoaJMDU0Rm8mdkSNNnE2k2").child("trips");
 
@@ -120,10 +126,10 @@ public class FirebaseHelper {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
-                if(!task.isSuccessful()){
+                if (!task.isSuccessful()) {
                     Log.i(TAG, "onComplete: failed");
                 }
-                
+
             }
         });
 
@@ -138,7 +144,5 @@ public class FirebaseHelper {
     public String getCurrentUserEmail() {
         return Objects.requireNonNull(mAuth.getCurrentUser()).getEmail();
     }
-
-
 }
 

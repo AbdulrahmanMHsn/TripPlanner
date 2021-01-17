@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorListener;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.FragmentLoginBinding;
+import amo.tripplanner.utilities.ButtonAnim;
 
 
 public class LoginFragment extends Fragment {
@@ -44,19 +47,23 @@ public class LoginFragment extends Fragment {
 
         onBackPressed();
 
+
+        view = container;
+
+        binding.textSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(v).navigate(R.id.action_loginFragment_to_signUpFragment);
+            }
+        });
+
         binding.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 login();
             }
         });
-        view = container;
-        binding.textSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(container).navigate(R.id.action_loginFragment_to_signUpFragment);
-            }
-        });
+
 
 //        binding.GoogleLoginImage.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -69,11 +76,14 @@ public class LoginFragment extends Fragment {
         return binding.getRoot();
     }
 
+
+
     @Override
     public void onStart() {
         super.onStart();
 
     }
+
 
     private void login() {
         String email = binding.editEmailLogin.getText().toString();
@@ -88,7 +98,7 @@ public class LoginFragment extends Fragment {
 
     }
 
-    private void onBackPressed(){
+    private void onBackPressed() {
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
