@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.Settings;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 import java.util.ArrayList;
 import java.util.List;
 
+import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.adapter.TripListAdapter;
 import amo.tripplanner.databinding.FragmentHomeBinding;
@@ -42,6 +44,7 @@ public class HomeFragment extends Fragment {
 
     DrawerLayout drawerLayout;
     NavigationView navigationView;
+
 
     private FragmentHomeBinding bindingHome;
 
@@ -72,10 +75,26 @@ public class HomeFragment extends Fragment {
         onBackPressed();
 
 
+        drawerLayout = bindingHome.drawerLayout;
+
+        bindingHome.navView.getMenu().getItem(4).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                FirebaseHelper.getInstance(getContext()).logOut();
+                Navigation.findNavController(getView()).navigate(R.id.action_homeFragment_to_loginFragment);
+                return false;
+            }
+        });
+        bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.open();
+            }
+        });
 
         bindingHome.idRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        adapter = new TripListAdapter();
+        adapter = new TripListAdapter(getContext());
         bindingHome.idRecyclerView.setAdapter(adapter);
 
         listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
@@ -109,9 +128,9 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-        bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(v -> {
+       /* bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(v -> {
 //               bindingHome.drawer.open();
-        });
+        });*/
 
     }
 

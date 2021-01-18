@@ -3,57 +3,78 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F4F4F4"
-        android:orientation="vertical"
-        tools:context=".homeScreen.HomeFragment">
+        android:fitsSystemWindows="true">
 
 
-        <LinearLayout
-            android:id="@+id/linearLayout2"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/id_recyclerView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent"
+            android:background="#F4F4F4"
+            android:orientation="vertical"
+            tools:context=".homeScreen.HomeFragment">
 
-            <include
-                android:id="@+id/toolbar"
-                layout="@layout/snippet_toolbar_home" />
 
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/id_recyclerView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/id_recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="514dp"
-            android:layout_below="@+id/linearLayout2"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-            tools:listitem="@layout/item_trip" />
+                <include
+                    android:id="@+id/toolbar"
+                    layout="@layout/snippet_toolbar_home" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/id_btn_add_trip"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="52dp"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="30dp"
-            android:background="@color/blue"
-            android:backgroundTint="@color/blue"
-            android:src="@drawable/ic_add"
-            android:textColor="@android:color/white" />
+            </LinearLayout>
 
-    </RelativeLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/id_recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="514dp"
+                android:layout_below="@+id/linearLayout2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+                tools:listitem="@layout/item_trip" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/id_btn_add_trip"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="52dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="30dp"
+                android:background="@color/blue"
+                android:backgroundTint="@color/blue"
+                android:src="@drawable/ic_add"
+                android:textColor="@android:color/white" />
+
+        </RelativeLayout>
+
+        <!-- Container for contents of drawer - use NavigationView to make configuration easier -->
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/header"
+            app:menu="@menu/drawer_menu"/>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
 
 
 </layout>

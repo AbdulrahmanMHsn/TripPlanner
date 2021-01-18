@@ -23,8 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    DrawerLayout drawerLayout;
-    NavController navController;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +31,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate: started.");
         
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        navController = Navigation.findNavController(this, R.id.myNavHostFragment);
-        drawerLayout = binding.drawerLayout;
-
-        binding.drawerToolbar.toolbarNavDrawer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.open();
-            }
-        });
 
 
 

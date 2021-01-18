@@ -2,7 +2,9 @@ package amo.tripplanner.adapter;
 
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +30,7 @@ import amo.tripplanner.ui.home.HomeFragmentDirections;
 
 public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripViewHolder> {
 
+    Context context;
     private static final String TAG = "TripListAdapter";
     private List<Trip> trips = new ArrayList<>();
 
@@ -41,7 +44,8 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
         mListener = listener;
     }
 
-    public TripListAdapter() {
+    public TripListAdapter(Context context) {
+        this.context = context;
     }
 
     @NonNull
@@ -96,6 +100,14 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
         holder.itemBinding.itemBtnStartTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                double latitude1 = item.getTripStartLocation().getLatitude();
+                double longitude1 = item.getTripStartLocation().getLongitude();
+                double latitude2 = item.getTripEndLocation().getLatitude();
+                double longitude2 = item.getTripEndLocation().getLongitude();
+
+                String uri = "http://maps.google.com/maps?f=d&hl=en&saddr="+latitude1+","+longitude1+"&daddr="+latitude2+","+longitude2;
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+                context.startActivity(Intent.createChooser(intent, "Select an application"));
                 Intent intent1 =new Intent(v.getContext(), FloatingWidgetService.class);
                 v.getContext().startService(intent1);
             }

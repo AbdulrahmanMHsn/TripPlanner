@@ -104,7 +104,7 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
 
         historyBinding.idRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        adapter = new TripListAdapter();
+        adapter = new TripListAdapter(getContext());
         historyBinding.idRecyclerView.setAdapter(adapter);
 
         listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
