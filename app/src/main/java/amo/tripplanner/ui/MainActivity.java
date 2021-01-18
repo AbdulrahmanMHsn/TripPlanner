@@ -23,7 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-
+    DrawerLayout drawerLayout;
+    NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

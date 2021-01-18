@@ -15,7 +15,7 @@ import amo.tripplanner.database.dao.TripDao;
 import amo.tripplanner.pojo.Trip;
 import timber.log.Timber;
 
-@Database(entities = {Trip.class}, version = 1, exportSchema = false)
+@Database(entities = {Trip.class}, version = 2, exportSchema = false)
 @TypeConverters({ConverterLocation.class, ConverterNote.class, ConverterDate.class})
 public abstract class AppDatabase extends RoomDatabase {
 

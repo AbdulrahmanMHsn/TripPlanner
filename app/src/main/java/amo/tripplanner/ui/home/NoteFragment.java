@@ -1,5 +1,6 @@
 package amo.tripplanner.ui.home;
 
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -63,22 +64,35 @@ public class NoteFragment extends Fragment {
         bindingNote.recyclerView.setAdapter(adapter);
 
 
-        listViewModels.getSubjectById(id).observe(getViewLifecycleOwner(), trip -> {
+        listViewModels.getNoteById(id).observe(getViewLifecycleOwner(), trip -> {
             list = trip.getTripNotes();
             adapter.setNotes(list);
         });
 
+
+
         adapter.setOnItemClickListener(new NoteListAdapter.OnItemClickListener() {
             @Override
             public void onItemDeleteClick(int position) {
-                list.remove(position);
-                listViewModels.deleteItemNote(id,list);
+
+//                list.remove(adapter.getItem(position));
+////                adapter.setNotes(list);
+//                Note note = adapter.getItem(position);
+//                TripListAdapter adapter = new TripListAdapter();
+//                final Trip trip = adapter.getItem(position);
+//                Note note
+//                listViewModels.delete(trip);
+////                listViewModels.deleteItemNote(id,list);
+//
+////                for(Note note:list){
+////                    Log.i("TAGNote", "onCreateView: "+note.getBody());
+////                }
             }
 
             @Override
             public void onItemChecked(int position) {
-                list.get(position).setChecked(true);
-                listViewModels.update(id,list);
+//                list.get(position).setChecked(true);
+//                listViewModels.update(id,list);
             }
         });
 
@@ -94,9 +108,11 @@ public class NoteFragment extends Fragment {
      * A function use to update trip within room database
      * */
     private void insertNoteToTrip() {
-        if(bindingNote.noteEdTxtVwBody.getText().toString().isEmpty()){
-            bindingNote.noteEdTxtVwBody.setError(getString(R.string.text_empty));
-            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            if(bindingNote.noteEdTxtVwBody.getText().toString().isEmpty()){
+                bindingNote.noteEdTxtVwBody.setError(getString(R.string.text_empty));
+                return;
+            }
         }
         String body = bindingNote.noteEdTxtVwBody.getText().toString();
 

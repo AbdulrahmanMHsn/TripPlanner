@@ -16,7 +16,11 @@ import amo.tripplanner.pojo.Trip;
 @Dao
 public interface TripDao {
 
-    @Query("SELECT * FROM trip_table")
+//    @Query("SELECT * FROM trip_table")
+//    LiveData<List<Trip>> getAllTrips();
+
+
+    @Query("SELECT * FROM trip_table WHERE trip_status = 'Upcoming'")
     LiveData<List<Trip>> getAllTrips();
 
 
@@ -24,11 +28,14 @@ public interface TripDao {
     LiveData<Trip> getAllNotesById(int tripId);
 
 
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    void insertTrip(Trip trip);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertTrip(Trip trip);
+    long insertTrip(Trip trip);
 
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateTrip(Trip trip);
 
 
@@ -39,6 +46,8 @@ public interface TripDao {
     @Query("UPDATE trip_table SET trip_note =:notes WHERE trip_id = :id")
     void deleteItemNote(int id, List<Note> notes);
 
+    @Delete
+    void deleteItemNote(Trip trip);
 
     @Delete
     void deleteTrip(Trip trip);

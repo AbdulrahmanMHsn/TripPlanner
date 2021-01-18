@@ -38,10 +38,20 @@ public class Trip {
     @ColumnInfo(name = "trip_note")
     private List<Note> tripNotes;
 
+    @ColumnInfo(name = "trip_idAlarm")
+    private int idAlarm;
+
 
     public Trip() {
     }
 
+    public int getIdAlarm() {
+        return idAlarm;
+    }
+
+    public void setIdAlarm(int idAlarm) {
+        this.idAlarm = idAlarm;
+    }
 
     @Ignore
     public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat) {
@@ -55,7 +65,7 @@ public class Trip {
     }
 
     @Ignore
-    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat,List<Note> tripNotes) {
+    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat, List<Note> tripNotes) {
         this.tripName = tripName;
         this.tripStartLocation = tripStartLocation;
         this.tripEndLocation = tripEndLocation;
@@ -66,7 +76,17 @@ public class Trip {
         this.tripNotes = tripNotes;
     }
 
-
+    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat, List<Note> tripNotes, int idAlarm) {
+        this.tripName = tripName;
+        this.tripStartLocation = tripStartLocation;
+        this.tripEndLocation = tripEndLocation;
+        this.tripTimestamp = tripTimestamp;
+        this.tripStatus = tripStatus;
+        this.tripIsRound = tripIsRound;
+        this.tripRepeat = tripRepeat;
+        this.tripNotes = tripNotes;
+        this.idAlarm = idAlarm;
+    }
 
     public String getTripStatus() {
         return tripStatus;

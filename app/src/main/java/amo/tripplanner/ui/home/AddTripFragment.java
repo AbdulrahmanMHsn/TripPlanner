@@ -16,6 +16,7 @@ import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -67,8 +68,7 @@ public class AddTripFragment extends Fragment {
     Calendar currentCalendar = Calendar.getInstance();
 
     //Alarm
-    AlarmManager alarmManager;
-    private int notificationId = 1;
+    private AlarmManager alarmManager;
     private int mYear, mMonth, mDay, currentHour, currentMin;
     private String amPm;
 
@@ -78,7 +78,7 @@ public class AddTripFragment extends Fragment {
     private double startLatitude, startLongitude;
     private double endLatitude, endLongitude;
     private long timestamp;
-    private String tripStatus = "Upcoming";
+    private final String tripStatus = "Upcoming";
     private boolean tripIsRound = false;
     private String tripRepeat;
 
@@ -153,6 +153,7 @@ public class AddTripFragment extends Fragment {
 
         // add trip
         binding.addTripBtnSave.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
             @Override
             public void onClick(View v) {
 
@@ -210,11 +211,15 @@ public class AddTripFragment extends Fragment {
                 Location startLocation = new Location(startAddress, startLatitude, startLongitude);
                 Location endLocation = new Location(endAddress, endLatitude, endLongitude);
                 List<Note> list = new ArrayList<>();
+                final int idAlarm = (int) System.currentTimeMillis();
+                turnOnAlarmManager(timestamp,idAlarm);
+                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list, idAlarm);
 
-                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list);
                 insertTrip(trip);
+//
                 Navigation.findNavController(view).popBackStack();
-
+                Toast.makeText(v.getContext(), trip.getTripId()+"", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), "Trip Saved", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -273,8 +278,9 @@ public class AddTripFragment extends Fragment {
     private void insertTrip(Trip trip) {
         // call observe
         TripListViewModel listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
-        listViewModel.insert(trip);
-        turnAlarmManager(timestamp, trip.getTripId());
+//         listViewModel.insert(trip);
+          listViewModel.insert(trip);
+//         listViewModel.getId();
     }
 
 
@@ -282,14 +288,11 @@ public class AddTripFragment extends Fragment {
      * A function use to create reminder
      * */
     @SuppressLint("ObsoleteSdkInt")
-    private void turnAlarmManager(long timestamp, int tripId) {
+    private void turnOnAlarmManager(long timestamp, int alarmId) {
         Intent intent = new Intent(requireContext(), AlarmRciever.class);
-        intent.putExtra("notificationId", notificationId);
-        intent.putExtra("Message", binding.addTripEdTxtVwTripName.getText());
+//        intent.putExtra("TripID", tripId);
 
-        final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), tripId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-//        intent.putExtra("notificationId",notificationId);
-//        intent.putExtra("Message",binding.addTripEdTxtVwTripName.getText());
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
@@ -298,7 +301,6 @@ public class AddTripFragment extends Fragment {
         } else {
             alarmManager.set(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
         }
-
     }
 
 
@@ -319,7 +321,12 @@ public class AddTripFragment extends Fragment {
                 } else {
                     amPm = "AM";
                 }
-                binding.addTripEdTxtVwTripTime.setText(String.format("%02d : %02d ", hourOfDay, minute) + amPm);
+                String time12 = String.format("%02d:%02d ", hourOfDay, minute);
+                binding.addTripEdTxtVwTripTime.setText(covertTimeTo12Hours(time12) + amPm);
+
+                Log.i(TAG, "onTimeSet: time12: " + covertTimeTo12Hours(time12));
+
+//                binding.addTripEdTxtVwTripTime.setText(covertTimeTo12Hours()+ amPm);
                 currentHour = hourOfDay;
                 currentMin = minute;
 
@@ -328,6 +335,44 @@ public class AddTripFragment extends Fragment {
 
         Objects.requireNonNull(timePickerDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         timePickerDialog.show();
+    }
+
+    private String covertTimeTo12Hours(String time) {
+        String[] splitTime = time.split(":");
+        String time12 = splitTime[1];
+
+        switch (splitTime[0]) {
+            case "12":
+                return "12:" + time12;
+            case "13":
+                return "01:" + time12;
+
+            case "14":
+                return "02:" + time12;
+
+            case "15":
+                return "03:" + time12;
+
+            case "16":
+                return "04:" + time12;
+
+            case "17":
+                return "05:" + time12;
+
+            case "18":
+                return "06:" + time12;
+            case "19":
+                return "07:" + time12;
+            case "20":
+                return "08:" + time12;
+            case "21":
+                return "09:" + time12;
+            case "22":
+                return "10:" + time12;
+            case "23":
+                return "11:" + time12;
+        }
+        return time;
     }
 
 
@@ -405,10 +450,6 @@ public class AddTripFragment extends Fragment {
                 endLongitude = latLng.getLongitude();
                 binding.addTripEdTxtVwTripEndPoint.setText(endAddress);
             }
-
-
-            Toast.makeText(getContext(), latLng.getLatitude() + "  " + latLng.getLongitude(), Toast.LENGTH_SHORT).show();
-
         }
     }
 
@@ -416,7 +457,7 @@ public class AddTripFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Navigation.findNavController(getView()).popBackStack();
+                Navigation.findNavController(requireView()).popBackStack();
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);

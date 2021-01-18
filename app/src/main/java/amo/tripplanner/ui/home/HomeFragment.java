@@ -1,6 +1,8 @@
 package amo.tripplanner.ui.home;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -36,8 +38,11 @@ import amo.tripplanner.R;
 import amo.tripplanner.adapter.TripListAdapter;
 import amo.tripplanner.databinding.FragmentHomeBinding;
 import amo.tripplanner.pojo.Trip;
+import amo.tripplanner.reciver.AlarmRciever;
 import amo.tripplanner.viewmodel.TripListViewModel;
 import timber.log.Timber;
+
+import static android.content.Context.ALARM_SERVICE;
 
 
 public class HomeFragment extends Fragment {
@@ -146,8 +151,10 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                final Trip subject = adapter.getItem(position);
-                listViewModel.delete(subject);
+                final Trip trip = adapter.getItem(position);
+                assert trip != null;
+                cancelAlarm(trip.getIdAlarm());
+                listViewModel.delete(trip);
             }
         });
         itemTouchHelper.attachToRecyclerView(bindingHome.idRecyclerView);
@@ -165,7 +172,7 @@ public class HomeFragment extends Fragment {
 
     public  void getPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getContext())){
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:"+getActivity().getPackageName()));
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:"+ requireActivity().getPackageName()));
             startActivityForResult(intent, 1);
         }
     }
@@ -180,5 +187,13 @@ public class HomeFragment extends Fragment {
                 }
             }
         }
+    }
+
+    private void cancelAlarm(int id){
+        AlarmManager alarmManager = (AlarmManager) requireActivity().getSystemService(ALARM_SERVICE);
+        Intent intent=new Intent(requireActivity(), AlarmRciever.class);
+        final PendingIntent pendingIntent=PendingIntent
+                .getBroadcast(requireContext(),id,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.cancel(pendingIntent);
     }
 }

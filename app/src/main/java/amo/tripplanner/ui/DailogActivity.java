@@ -1,6 +1,7 @@
 package amo.tripplanner.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -31,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
+import amo.tripplanner.Helper.NotificationHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.reciver.AlarmRciever;
 
@@ -280,22 +282,21 @@ public class DailogActivity extends AppCompatActivity {
 
             }
         });
+
         builder1.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //  AlarmManager alarmManager=(AlarmManager)g;
-                // Intent alarmIntent=new Intent(context,MainActivity.class);
-                //PendingIntent pendingIntent=PendingIntent.getBroadcast(context,0,alarmIntent,0);
-                // alarmManager.cancel(pendingIntent);
-
                 dialog.cancel();
             }
         });
+
         builder1.setNeutralButton("SNOOZE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                NotificationHelper notificationHelper = new NotificationHelper(context);
+                NotificationCompat.Builder nb = notificationHelper.getChannelNotification();
+                notificationHelper.getManager().notify(1, nb.build());
             }
         });
 

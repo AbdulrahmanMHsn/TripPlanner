@@ -27,12 +27,16 @@ public class TripListViewModel extends AndroidViewModel {
         return mAllTrips;
     }
 
-    public LiveData<Trip> getSubjectById(int tripId) {
+    public LiveData<Trip> getNoteById(int tripId) {
         return mRepository.getAllNotesById(tripId);
     }
 
     public void insert(Trip trip) {
-        mRepository.insert(trip);
+       mRepository.insert(trip);
+    }
+
+    public long getId(){
+       return mRepository.getIdTrip();
     }
 
     public void update(Trip trip) {
@@ -44,7 +48,11 @@ public class TripListViewModel extends AndroidViewModel {
     }
 
     public void deleteItemNote(int id,List<Note> notes) {
-        mRepository.update(id,notes);
+        mRepository.deleteItemNote(id,notes);
+    }
+
+    public void deleteItemNote(Trip trip) {
+        mRepository.deleteItemNote(trip);
     }
 
     public void delete(Trip trip) {

@@ -10,7 +10,9 @@ import android.os.Build;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
+import amo.tripplanner.Helper.NotificationHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.ui.DailogActivity;
 import amo.tripplanner.ui.MainActivity;
@@ -22,12 +24,7 @@ public class AlarmRciever extends BroadcastReceiver {
     @Override
     public void onReceive(Context context1, Intent intent) {
 
-        Toast.makeText(context1, "Done", Toast.LENGTH_SHORT).show();
         context = context1;
-
-        int notificationId = intent.getIntExtra("notificationId", 0);
-
-        msg = intent.getStringExtra("Message");
 
        /* if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             Intent serviceIntent = new Intent(context, MainActivity.class);
@@ -39,29 +36,30 @@ public class AlarmRciever extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
         }
-
         context.startActivity(i);
 
-        Intent mainIntent = new Intent(context, MainActivity.class);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Notification.Builder builder = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-            builder = new Notification.Builder(context);
-            builder.setSmallIcon(R.drawable.ic_notifications)
-                    .setContentTitle("TRIP TO DO")
-                    .setContentText("msg")
-                    .setWhen(System.currentTimeMillis())
-                    .setOngoing(true)
-                    .setContentIntent(pendingIntent)
-                    .setPriority(Notification.PRIORITY_MAX)
-                    .setDefaults(Notification.DEFAULT_ALL);
-
-            notificationManager.notify(notificationId, builder.build());
-        }
+//
+//        Intent mainIntent = new Intent(context, MainActivity.class);
+//
+//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+//
+//        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        Notification.Builder builder = null;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+//            builder = new Notification.Builder(context);
+//            builder.setSmallIcon(R.drawable.ic_notifications)
+//                    .setContentTitle("TRIP TO DO")
+//                    .setContentText("msg")
+//                    .setWhen(System.currentTimeMillis())
+//                    .setOngoing(true)
+//                    .setContentIntent(pendingIntent)
+//                    .setPriority(Notification.PRIORITY_MAX)
+//                    .setDefaults(Notification.DEFAULT_ALL);
+//
+//            notificationManager.notify(notificationId, builder.build());
+//        }
 
 //        DailogActivity.openDialog(context);
 
