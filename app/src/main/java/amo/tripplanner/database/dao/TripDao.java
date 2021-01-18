@@ -27,6 +27,10 @@ public interface TripDao {
     @Query("SELECT * FROM trip_table WHERE trip_id = :tripId")
     LiveData<Trip> getAllNotesById(int tripId);
 
+    @Query("SELECT * FROM trip_table WHERE trip_id = :tripId")
+    LiveData<Trip> getTripById(int tripId);
+
+
 
 //    @Insert(onConflict = OnConflictStrategy.REPLACE)
 //    void insertTrip(Trip trip);

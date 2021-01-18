@@ -169,7 +169,7 @@ public class HomeFragment extends Fragment {
                 int position = viewHolder.getAdapterPosition();
                 final Trip trip = adapter.getItem(position);
                 assert trip != null;
-                cancelAlarm(trip.getIdAlarm());
+                cancelAlarm(trip.getTripId());
                 listViewModel.delete(trip);
             }
         });

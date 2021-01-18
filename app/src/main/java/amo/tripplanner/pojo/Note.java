@@ -1,6 +1,11 @@
 package amo.tripplanner.pojo;
 
-public class Note {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
+public class Note implements Serializable {
 
     private String body;
     private boolean isChecked;
@@ -18,6 +23,12 @@ public class Note {
     public Note(String body, boolean isChecked) {
         this.body = body;
         this.isChecked = isChecked;
+    }
+
+
+    protected Note(Parcel in) {
+        body = in.readString();
+        isChecked = in.readByte() != 0;
     }
 
 
@@ -48,4 +59,5 @@ public class Note {
 //                ", isChecked=" + isChecked +
                 '}';
     }
+
 }

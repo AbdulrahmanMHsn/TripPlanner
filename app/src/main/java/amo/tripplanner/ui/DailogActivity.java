@@ -2,6 +2,9 @@ package amo.tripplanner.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -13,10 +16,14 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -26,30 +33,43 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import amo.tripplanner.Helper.NotificationHelper;
 import amo.tripplanner.R;
+import amo.tripplanner.pojo.Note;
+import amo.tripplanner.pojo.Trip;
 import amo.tripplanner.reciver.AlarmRciever;
+import amo.tripplanner.service.FloatingWidgetService;
+import amo.tripplanner.viewmodel.TripListViewModel;
 
 public class DailogActivity extends AppCompatActivity {
 
     EditText editText;
-    TextView datetx,timetx;
+    TextView datetx, timetx;
     Button add;
     Button repeated;
     Button cancel;
 
-    private int notificationId=1;
-    private int mYear, mMonth, mDay,currentHour,currentMin;
+    private int notificationId = 1;
+    private int mYear, mMonth, mDay, currentHour, currentMin;
     private String amPm;
+    private boolean isRestarted = false;
 
     private long timeInMilliseconds;
     private long dateInMilliseconds;
+    private TripListViewModel listViewModels;
+    private Trip trip = new Trip();
+    private int tripId;
+    private String tripName;
+    private List<Note> noteList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,229 +77,77 @@ public class DailogActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dailog);
 
 
-        openDialog(this);
-        // Create the object of
-        // AlertDialog Builder class
-//        AlertDialog.Builder builder
-//                = new AlertDialog
-//                .Builder(DailogActivity.this);
-//
-//        // Set the message show for the Alert time
-//        builder.setMessage("Do you want to exit ?");
-//
-//        // Set Alert Title
-//        builder.setTitle("Alert !");
-//
-//        // Set Cancelable false
-//        // for when the user clicks on the outside
-//        // the Dialog Box then it will remain show
-//        builder.setCancelable(false);
-//
-//        // Set the positive button with yes name
-//        // OnClickListener method is use of
-//        // DialogInterface interface.
-//
-//        builder
-//                .setPositiveButton(
-//                        "Yes",
-//                        new DialogInterface
-//                                .OnClickListener() {
-//
-//                            @Override
-//                            public void onClick(DialogInterface dialog,
-//                                                int which)
-//                            {
-//
-//                                // When the user click yes button
-//                                // then app will close
-//                                finish();
-//                            }
-//                        });
-//
-//        // Set the Negative button with No name
-//        // OnClickListener method is use
-//        // of DialogInterface interface.
-//        builder
-//                .setNegativeButton(
-//                        "No",
-//                        new DialogInterface
-//                                .OnClickListener() {
-//
-//                            @Override
-//                            public void onClick(DialogInterface dialog,
-//                                                int which)
-//                            {
-//
-//                                // If user click no
-//                                // then dialog box is canceled.
-//                                dialog.cancel();
-//                            }
-//                        });
-//
-//        // Create the Alert dialog
-//        AlertDialog alertDialog = builder.create();
-//        Objects.requireNonNull(alertDialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
-//        // Show the Alert Dialog box
-//        alertDialog.show();
+        int tripId = getIntent().getIntExtra("TripID", 0);
+        Log.i("DailogActivity", "onCreate: TripID: " + tripId);
 
-//        openDialog(this);
-//        editText=findViewById(R.id.id_edit_name);
-//        timetx=findViewById(R.id.time);
-////        datetx=findViewById(R.id.id_date);
-//        add=findViewById(R.id.bottomAdd);
-//        repeated=findViewById(R.id.id_repeated);
-//        cancel=findViewById(R.id.id_cancel);
+        listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
 
-//        AlarmManager alarmManager=(AlarmManager)getSystemService(Context.ALARM_SERVICE);
-//
-//        timetx.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                showTimePickerDialog();
-//            }
-//        });
-//
-//        datetx.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                showDatePickerDialog();
-//            }
-//        });
-//
-//        add.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//
-//                Intent intent=new Intent(DailogActivity.this, AlarmRciever.class);
-//                final PendingIntent pendingIntent=PendingIntent
-//                        .getBroadcast(DailogActivity.this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
-//
-//
-//                intent.putExtra("notificationId",notificationId);
-//                intent.putExtra("Message",editText.getText().toString());
-//
-//
-//                Calendar calendar=Calendar.getInstance();
-//
-//                calendar.set(Calendar.YEAR,mYear);
-//                calendar.set(Calendar.MONTH,mMonth);
-//                calendar.set(Calendar.DAY_OF_MONTH,mDay);
-//
-//                calendar.set(Calendar.HOUR_OF_DAY,currentHour);
-//                calendar.set(Calendar.MINUTE,currentMin);
-//                calendar.set(Calendar.SECOND,0);
-//
-//                long alarmStartTime=calendar.getTimeInMillis();
-//                alarmManager.set(AlarmManager.RTC_WAKEUP,alarmStartTime,pendingIntent);
-//
-//                Toast.makeText(DailogActivity.this, "Done", Toast.LENGTH_SHORT).show();
-//            }
-//
-//        });
-//
-//
-//        cancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                Intent intent=new Intent(DailogActivity.this,AlarmRciever.class);
-//                final PendingIntent pendingIntent=PendingIntent
-//                        .getBroadcast(DailogActivity.this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
-//
-//                alarmManager.cancel(pendingIntent);
-//                Toast.makeText(DailogActivity.this, "Alarm cancelled", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
-
-       /* repeated.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Calendar calendar=Calendar.getInstance();
-
-                calendar.set(Calendar.YEAR,mYear);
-                calendar.set(Calendar.MONTH,mMonth);
-                calendar.set(Calendar.DAY_OF_MONTH,mDay);
-
-                calendar.set(Calendar.HOUR_OF_DAY,currentHour);
-                calendar.set(Calendar.MINUTE,currentMin);
-                calendar.set(Calendar.SECOND,0);
-                Intent intent=new Intent(getApplicationContext(),NotificationReciever.class);
-
-                PendingIntent pendingIntent=PendingIntent.getBroadcast(MainActivity.this,100,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-
+        listViewModels.getTripById(tripId).observe(this, trips -> {
+            trip = trips;
+            if (!isRestarted) {
+                saveOnSharedPreference();
+                isRestarted = true;
+                Log.i("isRestarted", "onCreate: "+isRestarted);
             }
-        });*/
+            Log.i("isRestarted", "onCreate: "+isRestarted);
+            getDataFromSharedPreference();
+            openDialog(this);
+        });
+
+
+
+
+
+        TripListViewModel listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
+        listViewModels.getNoteById(tripId).observe(this, trip -> {
+            noteList = trip.getTripNotes();
+            for(Note note:noteList){
+                Log.i("FloatingWidgetService", "onStartCommand: "+note);
+            }
+        });
+
+
+
 
 
     }
 
-    private void showDatePickerDialog() {
-        Calendar cal = Calendar.getInstance();
-        mYear = cal.get(Calendar.YEAR);
-        mMonth = cal.get(Calendar.MONTH);
-        mDay = cal.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog dialog = new DatePickerDialog(DailogActivity.this, android.R.style.Theme_Holo_Light_Dialog, new DatePickerDialog.OnDateSetListener() {
-            @SuppressLint("SimpleDateFormat")
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                int months= month+1;
-                Date date = null;
-                try {
-                    date = new SimpleDateFormat("dd/MM/yyyy").parse(dayOfMonth + "/" + months + "/" + year);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                if (date != null) {
-                    datetx.setText(new SimpleDateFormat("dd / MM / yyyy").format(date));
-                    dateInMilliseconds = date.getTime();
-                }
-                mYear=year;
-                mMonth=month;
-                mDay=dayOfMonth;
-
-            }
-        }, mYear, mMonth, mDay);
-
-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
+    private void saveOnSharedPreference() {
+        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("TripId", trip.getTripId());
+        editor.putString("TripName", trip.getTripName());
+        editor.commit();
     }
 
-    private void showTimePickerDialog() {
-        Calendar calendar = Calendar.getInstance();
-        currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-        currentMin = calendar.get(Calendar.MINUTE);
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(DailogActivity.this, android.R.style.Theme_Holo_Light_Dialog, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                if (hourOfDay>=12){
-                    amPm="PM";
-                }else {
-                    amPm="AM";
-                }
-                timetx.setText(String.format("%02d:%02d",hourOfDay,minute)+amPm);
-                currentHour=hourOfDay;
-                currentMin=minute;
-            }
-        },currentHour,currentMin,false);
-        timePickerDialog.show();
+    private void getDataFromSharedPreference() {
+        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
+        tripId = preferences.getInt("TripId", 0);
+        tripName = preferences.getString("TripName", "TripName");
     }
 
     @SuppressLint("ObsoleteSdkInt")
-    public static void openDialog(Context context){
+    public void openDialog(Context context) {
 
-        AlertDialog.Builder builder1=new AlertDialog.Builder(context);
-        builder1.setTitle("TRIP TO DO");
-        builder1.setMessage("It's time for your  trip");
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+        builder1.setTitle(tripName);
+        builder1.setMessage("It's time for your  trip " + tripName);
         builder1.setCancelable(false);
         builder1.setPositiveButton("START", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                double latitude1 = trip.getTripStartLocation().getLatitude();
+                double longitude1 = trip.getTripStartLocation().getLongitude();
+                double latitude2 = trip.getTripEndLocation().getLatitude();
+                double longitude2 = trip.getTripEndLocation().getLongitude();
+
+                String uri = "http://maps.google.com/maps?f=d&hl=en&saddr="+latitude1+","+longitude1+"&daddr="+latitude2+","+longitude2;
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+                context.startActivity(Intent.createChooser(intent, "Select an application"));
+                Intent intent1 = new Intent(getBaseContext(), FloatingWidgetService.class);
+                intent1.putExtra("ListNotes", (Serializable) noteList);
+                startService(intent1);
             }
         });
 
@@ -295,24 +163,29 @@ public class DailogActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 NotificationHelper notificationHelper = new NotificationHelper(context);
-                NotificationCompat.Builder nb = notificationHelper.getChannelNotification();
+                NotificationCompat.Builder nb = notificationHelper.getChannelNotification(tripName);
                 notificationHelper.getManager().notify(1, nb.build());
             }
         });
 
-        AlertDialog dialog=builder1.create();
-        if(dialog.getWindow()!=null){
+        AlertDialog dialog = builder1.create();
+        if (dialog.getWindow() != null) {
             int type;
-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT){
-                type= WindowManager.LayoutParams.TYPE_TOAST;
-            }
-            else{
-                type= WindowManager.LayoutParams.TYPE_PHONE;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                type = WindowManager.LayoutParams.TYPE_TOAST;
+            } else {
+                type = WindowManager.LayoutParams.TYPE_PHONE;
             }
             dialog.getWindow().setType(type);
             Objects.requireNonNull(dialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             dialog.show();
         }
 
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        isRestarted = true;
     }
 }

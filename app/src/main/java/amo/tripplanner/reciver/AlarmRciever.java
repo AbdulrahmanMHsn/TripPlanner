@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -26,6 +27,9 @@ public class AlarmRciever extends BroadcastReceiver {
 
         context = context1;
 
+        int tripId = intent.getIntExtra("TripID", 0);
+        Log.i("AlarmRciever", "onReceive: tripId : "+tripId);
+
        /* if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             Intent serviceIntent = new Intent(context, MainActivity.class);
 
@@ -35,7 +39,9 @@ public class AlarmRciever extends BroadcastReceiver {
         Intent i = new Intent(context, DailogActivity.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            i.putExtra("TripID",tripId);
         }
+
         context.startActivity(i);
 
 

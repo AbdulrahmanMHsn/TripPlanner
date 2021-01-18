@@ -10,7 +10,7 @@ import java.util.List;
 @Entity(tableName = "trip_table")
 public class Trip {
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = "trip_id")
     private int tripId;
 
@@ -38,20 +38,13 @@ public class Trip {
     @ColumnInfo(name = "trip_note")
     private List<Note> tripNotes;
 
-    @ColumnInfo(name = "trip_idAlarm")
-    private int idAlarm;
+//    @ColumnInfo(name = "trip_idAlarm")
+//    private int idAlarm;
 
 
     public Trip() {
     }
 
-    public int getIdAlarm() {
-        return idAlarm;
-    }
-
-    public void setIdAlarm(int idAlarm) {
-        this.idAlarm = idAlarm;
-    }
 
     @Ignore
     public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat) {
@@ -76,7 +69,7 @@ public class Trip {
         this.tripNotes = tripNotes;
     }
 
-    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat, List<Note> tripNotes, int idAlarm) {
+    public Trip(int tripId,String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat, List<Note> tripNotes) {
         this.tripName = tripName;
         this.tripStartLocation = tripStartLocation;
         this.tripEndLocation = tripEndLocation;
@@ -85,7 +78,7 @@ public class Trip {
         this.tripIsRound = tripIsRound;
         this.tripRepeat = tripRepeat;
         this.tripNotes = tripNotes;
-        this.idAlarm = idAlarm;
+        this.tripId = tripId;
     }
 
     public String getTripStatus() {

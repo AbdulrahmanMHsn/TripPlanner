@@ -44,17 +44,17 @@ public class NotificationHelper extends ContextWrapper {
         return mManager;
     }
 
-    public NotificationCompat.Builder getChannelNotification() {
+    public NotificationCompat.Builder getChannelNotification(String msg) {
         Intent mainIntent = new Intent(context, DailogActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
-                .setContentTitle("Alarm!")
-                .setContentText("Your AlarmManager is working.")
+                .setContentTitle(msg)
+                .setContentText("Your waiting for trip "+msg)
                 .setOngoing(true)
                 .setContentIntent(pendingIntent)
                 .setPriority(Notification.PRIORITY_MAX)
                 .setDefaults(Notification.DEFAULT_ALL)
-                .setSmallIcon(R.drawable.ic_launcher_foreground);
+                .setSmallIcon(R.drawable.index);
     }
 
 }

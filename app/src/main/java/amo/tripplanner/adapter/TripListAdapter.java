@@ -17,6 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +118,7 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
                 context.startActivity(Intent.createChooser(intent, "Select an application"));
                 Intent intent1 = new Intent(v.getContext(), FloatingWidgetService.class);
+                intent1.putExtra("ListNotes", (Serializable) item.getTripNotes());
                 v.getContext().startService(intent1);
             }
         });

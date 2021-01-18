@@ -1,0 +1,892 @@
+Index: app/src/main/java/amo/tripplanner/service/FloatingWidgetService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.service;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.app.Service;\r\nimport android.content.Intent;\r\nimport android.graphics.PixelFormat;\r\nimport android.net.Uri;\r\nimport android.os.Build;\r\nimport android.os.IBinder;\r\nimport android.text.Layout;\r\nimport android.util.Log;\r\nimport android.view.Gravity;\r\nimport android.view.LayoutInflater;\r\nimport android.view.MotionEvent;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.view.WindowManager;\r\nimport android.widget.ImageView;\r\nimport android.widget.PopupMenu;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.Nullable;\r\nimport androidx.recyclerview.widget.LinearLayoutManager;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\nimport com.google.android.material.floatingactionbutton.FloatingActionButton;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Calendar;\r\nimport java.util.List;\r\n\r\nimport amo.tripplanner.R;\r\nimport amo.tripplanner.adapter.NoteListAdapter;\r\nimport amo.tripplanner.pojo.Note;\r\n\r\n\r\npublic class FloatingWidgetService extends Service {\r\n\r\n    int LAYOUT_FLAG;\r\n    View mFloatingView;\r\n    WindowManager windowManager;\r\n    ImageView imageClose;\r\n    TextView tvWidget;\r\n    float width, height;\r\n\r\n    @Nullable\r\n    @Override\r\n    public IBinder onBind(Intent intent) {\r\n        return null;\r\n    }\r\n\r\n    @Override\r\n    public int onStartCommand(Intent intent, int flags, int startId) {\r\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {\r\n            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;\r\n        } else {\r\n            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_PHONE;\r\n        }\r\n\r\n        // inflate widget layout\r\n        mFloatingView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null);\r\n        WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,\r\n                WindowManager.LayoutParams.WRAP_CONTENT,\r\n                LAYOUT_FLAG,\r\n                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,\r\n                PixelFormat.TRANSLUCENT);\r\n        // initial Position\r\n        layoutParam.gravity = Gravity.TOP | Gravity.RIGHT;\r\n        layoutParam.x = 0;\r\n        layoutParam.y = 100;\r\n\r\n        // layout parameter for close button\r\n        WindowManager.LayoutParams imageParams = new WindowManager.LayoutParams(140,\r\n                140,\r\n                LAYOUT_FLAG,\r\n                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,\r\n                PixelFormat.TRANSLUCENT);\r\n\r\n        imageParams.gravity = Gravity.BOTTOM | Gravity.CENTER;\r\n        imageParams.y = 100;\r\n\r\n\r\n        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);\r\n        imageClose = new ImageView(this);\r\n        imageClose.setImageResource(R.drawable.ic_launcher_background);\r\n        imageClose.setVisibility(View.INVISIBLE);\r\n        windowManager.addView(imageClose, imageParams);\r\n        windowManager.addView(mFloatingView, layoutParam);\r\n        mFloatingView.setVisibility(View.VISIBLE);\r\n\r\n        height = windowManager.getDefaultDisplay().getHeight();\r\n        width = windowManager.getDefaultDisplay().getWidth();\r\n\r\n        View expandedView = mFloatingView.findViewById(R.id.expanded_view);\r\n        expandedView.setVisibility(View.GONE);\r\n\r\n//        ImageView imageView = mFloatingView.findViewById(R.id.fabHead);\r\n//        imageView.setOnClickListener(new View.OnClickListener() {\r\n//            @Override\r\n//            public void onClick(View v) {\r\n//                Log.i(\"Mohamed\", \"Mohamed\");\r\n\r\n//\r\n//            }\r\n//        });\r\n\r\n\r\n        /*mFloatingView.setClickable(true);\r\n        mFloatingView.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                Log.i(\"Mohamed\", \"Mohamed\");\r\n            }\r\n        });*/\r\n        mFloatingView.setOnTouchListener(new View.OnTouchListener() {\r\n            int initialX, initialY;\r\n            float initialTouchX, initialTouchY;\r\n            long startClickTime;\r\n            int maxClickDuration = 200;\r\n\r\n\r\n            @SuppressLint(\"ClickableViewAccessibility\")\r\n            @Override\r\n            public boolean onTouch(View v, MotionEvent event) {\r\n                switch (event.getAction()) {\r\n\r\n                    case MotionEvent.ACTION_DOWN:\r\n                        startClickTime = Calendar.getInstance().getTimeInMillis();\r\n                        imageClose.setVisibility(View.VISIBLE);\r\n                        initialX = layoutParam.x;\r\n                        initialY = layoutParam.y;\r\n                        initialTouchX = event.getRawX();\r\n                        initialTouchY = event.getRawY();\r\n                        return true;\r\n\r\n\r\n                    case MotionEvent.ACTION_UP:\r\n                        long clickDuration = Calendar.getInstance().getTimeInMillis() - startClickTime;\r\n                        imageClose.setVisibility(View.GONE);\r\n                        layoutParam.x = initialX + (int) (initialTouchX - event.getRawX());\r\n                        layoutParam.y = initialY + (int) (event.getRawY() - initialTouchY);\r\n\r\n                        if (clickDuration < maxClickDuration) {\r\n                            if (expandedView.getVisibility() == View.GONE){\r\n                                expandedView.setVisibility(View.VISIBLE);\r\n                            }\r\n                            else if (expandedView.getVisibility() == View.VISIBLE){\r\n                                expandedView.setVisibility(View.GONE);\r\n                            }\r\n                        } else {\r\n                            if (layoutParam.y > (height * 0.6)) {\r\n                                stopSelf();\r\n                            }\r\n                        }\r\n                        return true;\r\n                    case MotionEvent.ACTION_MOVE:\r\n                        layoutParam.x = initialX + (int) (initialTouchX - event.getRawX());\r\n                        layoutParam.y = initialY + (int) (event.getRawY() - initialTouchY);\r\n\r\n                        windowManager.updateViewLayout(mFloatingView, layoutParam);\r\n                        if (layoutParam.y > (height * 0.6)) {\r\n                            imageClose.setImageResource(R.drawable.ic_close);\r\n                        } else {\r\n                            imageClose.setImageResource(R.drawable.ic_close);\r\n                        }\r\n\r\n                        return true;\r\n                }\r\n\r\n                return false;\r\n            }\r\n        });\r\n\r\n        return START_STICKY;\r\n    }\r\n\r\n    @Override\r\n    public void onDestroy() {\r\n        super.onDestroy();\r\n\r\n        if (mFloatingView != null) {\r\n            windowManager.removeView(mFloatingView);\r\n        }\r\n\r\n        if (imageClose != null) {\r\n            windowManager.removeView(imageClose);\r\n        }\r\n    }\r\n\r\n    /*private void getNote(){\r\n        WindowManager mWindowManager = (WindowManager)getSystemService(WINDOW_SERVICE);\r\n        WindowManager.LayoutParams listParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,\r\n                WindowManager.LayoutParams.WRAP_CONTENT);\r\n        listParams.gravity = Gravity.CENTER;\r\n        listParams.x = 100;\r\n        listParams.y = 100;\r\n        List<Note> arrayList = new ArrayList<>();\r\n        arrayList.add(new Note(\"AS\"));\r\n        arrayList.add(new Note(\"AS\"));\r\n        arrayList.add(new Note(\"AS\"));\r\n\r\n        View view = LayoutInflater.from(FloatingWidgetService.this).inflate(R.layout.fragment_note, null);\r\n        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);\r\n        recyclerView.setLayoutManager(new LinearLayoutManager(FloatingWidgetService.this));\r\n        NoteListAdapter adapter = new NoteListAdapter();\r\n        adapter.setNotes(arrayList);\r\n        recyclerView.setAdapter(adapter);\r\n        mWindowManager.addView(view, listParams);\r\n        view.setVisibility(View.VISIBLE);\r\n    }*/\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/service/FloatingWidgetService.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/service/FloatingWidgetService.java	(date 1611009617089)
+@@ -2,6 +2,7 @@
+ 
+ import android.annotation.SuppressLint;
+ import android.app.Service;
++import android.content.Context;
+ import android.content.Intent;
+ import android.graphics.PixelFormat;
+ import android.net.Uri;
+@@ -21,6 +22,8 @@
+ import android.widget.Toast;
+ 
+ import androidx.annotation.Nullable;
++import androidx.fragment.app.FragmentActivity;
++import androidx.lifecycle.ViewModelProviders;
+ import androidx.recyclerview.widget.LinearLayoutManager;
+ import androidx.recyclerview.widget.RecyclerView;
+ 
+@@ -33,6 +36,7 @@
+ import amo.tripplanner.R;
+ import amo.tripplanner.adapter.NoteListAdapter;
+ import amo.tripplanner.pojo.Note;
++import amo.tripplanner.viewmodel.TripListViewModel;
+ 
+ 
+ public class FloatingWidgetService extends Service {
+@@ -43,6 +47,7 @@
+     ImageView imageClose;
+     TextView tvWidget;
+     float width, height;
++    private NoteListAdapter adapter;
+ 
+     @Nullable
+     @Override
+@@ -52,12 +57,28 @@
+ 
+     @Override
+     public int onStartCommand(Intent intent, int flags, int startId) {
++
++        List<Note> notes = new ArrayList<>();
++//        notes.add(new Note("adapter"));
++//        notes.add(new Note("adapter"));
++//        notes.add(new Note("adapter"));
++//        notes.add(new Note("adapter"));
++//        List<Note> notes = intent.<Note>getParcelableArrayListExtra("ListNotes");
++         notes = (List<Note>) intent.getSerializableExtra("ListNotes");
++
++        adapter = new NoteListAdapter();
++
++//        for(Note note:notes){
++//            Log.i("FloatingWidgetService", "onStartCommand: "+note);
++//        }
++
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+             LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+         } else {
+             LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_PHONE;
+         }
+ 
++
+         // inflate widget layout
+         mFloatingView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null);
+         WindowManager.LayoutParams layoutParam = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+@@ -94,6 +115,10 @@
+ 
+         View expandedView = mFloatingView.findViewById(R.id.expanded_view);
+         expandedView.setVisibility(View.GONE);
++        RecyclerView recyclerView = expandedView.findViewById(R.id.recyclerViewOver);
++        recyclerView.setLayoutManager(new LinearLayoutManager(this));
++        recyclerView.setAdapter(adapter);
++        adapter.setNotes(notes);
+ 
+ //        ImageView imageView = mFloatingView.findViewById(R.id.fabHead);
+ //        imageView.setOnClickListener(new View.OnClickListener() {
+@@ -143,6 +168,7 @@
+ 
+                         if (clickDuration < maxClickDuration) {
+                             if (expandedView.getVisibility() == View.GONE){
++
+                                 expandedView.setVisibility(View.VISIBLE);
+                             }
+                             else if (expandedView.getVisibility() == View.VISIBLE){
+@@ -210,5 +236,8 @@
+         view.setVisibility(View.VISIBLE);
+     }*/
+ 
++    private void getNote(Context context,int id){
++
++    }
+ 
+ }
+Index: app/src/main/java/amo/tripplanner/ui/DailogActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.ui;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.core.app.NotificationCompat;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.app.AlarmManager;\r\nimport android.app.AlertDialog;\r\nimport android.app.DatePickerDialog;\r\nimport android.app.Dialog;\r\nimport android.app.PendingIntent;\r\nimport android.app.TimePickerDialog;\r\nimport android.content.Context;\r\nimport android.content.DialogInterface;\r\nimport android.content.Intent;\r\nimport android.graphics.Color;\r\nimport android.graphics.drawable.ColorDrawable;\r\nimport android.os.Build;\r\nimport android.os.Bundle;\r\nimport android.view.View;\r\nimport android.view.WindowManager;\r\nimport android.widget.Button;\r\nimport android.widget.DatePicker;\r\nimport android.widget.EditText;\r\nimport android.widget.TextView;\r\nimport android.widget.TimePicker;\r\nimport android.widget.Toast;\r\n\r\nimport java.text.ParseException;\r\nimport java.text.SimpleDateFormat;\r\nimport java.util.Calendar;\r\nimport java.util.Date;\r\nimport java.util.Objects;\r\n\r\nimport amo.tripplanner.Helper.NotificationHelper;\r\nimport amo.tripplanner.R;\r\nimport amo.tripplanner.reciver.AlarmRciever;\r\n\r\npublic class DailogActivity extends AppCompatActivity {\r\n\r\n    EditText editText;\r\n    TextView datetx,timetx;\r\n    Button add;\r\n    Button repeated;\r\n    Button cancel;\r\n\r\n    private int notificationId=1;\r\n    private int mYear, mMonth, mDay,currentHour,currentMin;\r\n    private String amPm;\r\n\r\n    private long timeInMilliseconds;\r\n    private long dateInMilliseconds;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_dailog);\r\n\r\n\r\n        openDialog(this);\r\n        // Create the object of\r\n        // AlertDialog Builder class\r\n//        AlertDialog.Builder builder\r\n//                = new AlertDialog\r\n//                .Builder(DailogActivity.this);\r\n//\r\n//        // Set the message show for the Alert time\r\n//        builder.setMessage(\"Do you want to exit ?\");\r\n//\r\n//        // Set Alert Title\r\n//        builder.setTitle(\"Alert !\");\r\n//\r\n//        // Set Cancelable false\r\n//        // for when the user clicks on the outside\r\n//        // the Dialog Box then it will remain show\r\n//        builder.setCancelable(false);\r\n//\r\n//        // Set the positive button with yes name\r\n//        // OnClickListener method is use of\r\n//        // DialogInterface interface.\r\n//\r\n//        builder\r\n//                .setPositiveButton(\r\n//                        \"Yes\",\r\n//                        new DialogInterface\r\n//                                .OnClickListener() {\r\n//\r\n//                            @Override\r\n//                            public void onClick(DialogInterface dialog,\r\n//                                                int which)\r\n//                            {\r\n//\r\n//                                // When the user click yes button\r\n//                                // then app will close\r\n//                                finish();\r\n//                            }\r\n//                        });\r\n//\r\n//        // Set the Negative button with No name\r\n//        // OnClickListener method is use\r\n//        // of DialogInterface interface.\r\n//        builder\r\n//                .setNegativeButton(\r\n//                        \"No\",\r\n//                        new DialogInterface\r\n//                                .OnClickListener() {\r\n//\r\n//                            @Override\r\n//                            public void onClick(DialogInterface dialog,\r\n//                                                int which)\r\n//                            {\r\n//\r\n//                                // If user click no\r\n//                                // then dialog box is canceled.\r\n//                                dialog.cancel();\r\n//                            }\r\n//                        });\r\n//\r\n//        // Create the Alert dialog\r\n//        AlertDialog alertDialog = builder.create();\r\n//        Objects.requireNonNull(alertDialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);\r\n//        // Show the Alert Dialog box\r\n//        alertDialog.show();\r\n\r\n//        openDialog(this);\r\n//        editText=findViewById(R.id.id_edit_name);\r\n//        timetx=findViewById(R.id.time);\r\n////        datetx=findViewById(R.id.id_date);\r\n//        add=findViewById(R.id.bottomAdd);\r\n//        repeated=findViewById(R.id.id_repeated);\r\n//        cancel=findViewById(R.id.id_cancel);\r\n\r\n//        AlarmManager alarmManager=(AlarmManager)getSystemService(Context.ALARM_SERVICE);\r\n//\r\n//        timetx.setOnClickListener(new View.OnClickListener() {\r\n//            @Override\r\n//            public void onClick(View v) {\r\n//                showTimePickerDialog();\r\n//            }\r\n//        });\r\n//\r\n//        datetx.setOnClickListener(new View.OnClickListener() {\r\n//            @Override\r\n//            public void onClick(View v) {\r\n//                showDatePickerDialog();\r\n//            }\r\n//        });\r\n//\r\n//        add.setOnClickListener(new View.OnClickListener() {\r\n//            @Override\r\n//            public void onClick(View v) {\r\n//\r\n//\r\n//                Intent intent=new Intent(DailogActivity.this, AlarmRciever.class);\r\n//                final PendingIntent pendingIntent=PendingIntent\r\n//                        .getBroadcast(DailogActivity.this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);\r\n//\r\n//\r\n//                intent.putExtra(\"notificationId\",notificationId);\r\n//                intent.putExtra(\"Message\",editText.getText().toString());\r\n//\r\n//\r\n//                Calendar calendar=Calendar.getInstance();\r\n//\r\n//                calendar.set(Calendar.YEAR,mYear);\r\n//                calendar.set(Calendar.MONTH,mMonth);\r\n//                calendar.set(Calendar.DAY_OF_MONTH,mDay);\r\n//\r\n//                calendar.set(Calendar.HOUR_OF_DAY,currentHour);\r\n//                calendar.set(Calendar.MINUTE,currentMin);\r\n//                calendar.set(Calendar.SECOND,0);\r\n//\r\n//                long alarmStartTime=calendar.getTimeInMillis();\r\n//                alarmManager.set(AlarmManager.RTC_WAKEUP,alarmStartTime,pendingIntent);\r\n//\r\n//                Toast.makeText(DailogActivity.this, \"Done\", Toast.LENGTH_SHORT).show();\r\n//            }\r\n//\r\n//        });\r\n//\r\n//\r\n//        cancel.setOnClickListener(new View.OnClickListener() {\r\n//            @Override\r\n//            public void onClick(View v) {\r\n//\r\n//                Intent intent=new Intent(DailogActivity.this,AlarmRciever.class);\r\n//                final PendingIntent pendingIntent=PendingIntent\r\n//                        .getBroadcast(DailogActivity.this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);\r\n//\r\n//                alarmManager.cancel(pendingIntent);\r\n//                Toast.makeText(DailogActivity.this, \"Alarm cancelled\", Toast.LENGTH_SHORT).show();\r\n//            }\r\n//        });\r\n\r\n\r\n       /* repeated.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n\r\n                Calendar calendar=Calendar.getInstance();\r\n\r\n                calendar.set(Calendar.YEAR,mYear);\r\n                calendar.set(Calendar.MONTH,mMonth);\r\n                calendar.set(Calendar.DAY_OF_MONTH,mDay);\r\n\r\n                calendar.set(Calendar.HOUR_OF_DAY,currentHour);\r\n                calendar.set(Calendar.MINUTE,currentMin);\r\n                calendar.set(Calendar.SECOND,0);\r\n                Intent intent=new Intent(getApplicationContext(),NotificationReciever.class);\r\n\r\n                PendingIntent pendingIntent=PendingIntent.getBroadcast(MainActivity.this,100,intent,PendingIntent.FLAG_UPDATE_CURRENT);\r\n\r\n            }\r\n        });*/\r\n\r\n\r\n    }\r\n\r\n    private void showDatePickerDialog() {\r\n        Calendar cal = Calendar.getInstance();\r\n        mYear = cal.get(Calendar.YEAR);\r\n        mMonth = cal.get(Calendar.MONTH);\r\n        mDay = cal.get(Calendar.DAY_OF_MONTH);\r\n\r\n        DatePickerDialog dialog = new DatePickerDialog(DailogActivity.this, android.R.style.Theme_Holo_Light_Dialog, new DatePickerDialog.OnDateSetListener() {\r\n            @SuppressLint(\"SimpleDateFormat\")\r\n            @Override\r\n            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {\r\n                int months= month+1;\r\n                Date date = null;\r\n                try {\r\n                    date = new SimpleDateFormat(\"dd/MM/yyyy\").parse(dayOfMonth + \"/\" + months + \"/\" + year);\r\n                } catch (ParseException e) {\r\n                    e.printStackTrace();\r\n                }\r\n                if (date != null) {\r\n                    datetx.setText(new SimpleDateFormat(\"dd / MM / yyyy\").format(date));\r\n                    dateInMilliseconds = date.getTime();\r\n                }\r\n                mYear=year;\r\n                mMonth=month;\r\n                mDay=dayOfMonth;\r\n\r\n            }\r\n        }, mYear, mMonth, mDay);\r\n\r\n        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));\r\n        dialog.show();\r\n    }\r\n\r\n    private void showTimePickerDialog() {\r\n        Calendar calendar = Calendar.getInstance();\r\n        currentHour = calendar.get(Calendar.HOUR_OF_DAY);\r\n        currentMin = calendar.get(Calendar.MINUTE);\r\n\r\n        TimePickerDialog timePickerDialog = new TimePickerDialog(DailogActivity.this, android.R.style.Theme_Holo_Light_Dialog, new TimePickerDialog.OnTimeSetListener() {\r\n            @Override\r\n            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {\r\n                if (hourOfDay>=12){\r\n                    amPm=\"PM\";\r\n                }else {\r\n                    amPm=\"AM\";\r\n                }\r\n                timetx.setText(String.format(\"%02d:%02d\",hourOfDay,minute)+amPm);\r\n                currentHour=hourOfDay;\r\n                currentMin=minute;\r\n            }\r\n        },currentHour,currentMin,false);\r\n        timePickerDialog.show();\r\n    }\r\n\r\n    @SuppressLint(\"ObsoleteSdkInt\")\r\n    public static void openDialog(Context context){\r\n\r\n        AlertDialog.Builder builder1=new AlertDialog.Builder(context);\r\n        builder1.setTitle(\"TRIP TO DO\");\r\n        builder1.setMessage(\"It's time for your  trip\");\r\n        builder1.setCancelable(false);\r\n        builder1.setPositiveButton(\"START\", new DialogInterface.OnClickListener() {\r\n            @Override\r\n            public void onClick(DialogInterface dialog, int which) {\r\n\r\n            }\r\n        });\r\n\r\n        builder1.setNegativeButton(\"CANCEL\", new DialogInterface.OnClickListener() {\r\n\r\n            @Override\r\n            public void onClick(DialogInterface dialog, int which) {\r\n                dialog.cancel();\r\n            }\r\n        });\r\n\r\n        builder1.setNeutralButton(\"SNOOZE\", new DialogInterface.OnClickListener() {\r\n            @Override\r\n            public void onClick(DialogInterface dialog, int which) {\r\n                NotificationHelper notificationHelper = new NotificationHelper(context);\r\n                NotificationCompat.Builder nb = notificationHelper.getChannelNotification();\r\n                notificationHelper.getManager().notify(1, nb.build());\r\n            }\r\n        });\r\n\r\n        AlertDialog dialog=builder1.create();\r\n        if(dialog.getWindow()!=null){\r\n            int type;\r\n            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT){\r\n                type= WindowManager.LayoutParams.TYPE_TOAST;\r\n            }\r\n            else{\r\n                type= WindowManager.LayoutParams.TYPE_PHONE;\r\n            }\r\n            dialog.getWindow().setType(type);\r\n            Objects.requireNonNull(dialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);\r\n            dialog.show();\r\n        }\r\n\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/ui/DailogActivity.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/ui/DailogActivity.java	(date 1611010640713)
+@@ -2,6 +2,9 @@
+ 
+ import androidx.appcompat.app.AppCompatActivity;
+ import androidx.core.app.NotificationCompat;
++import androidx.fragment.app.FragmentActivity;
++import androidx.lifecycle.LifecycleOwner;
++import androidx.lifecycle.ViewModelProviders;
+ 
+ import android.annotation.SuppressLint;
+ import android.app.AlarmManager;
+@@ -13,10 +16,14 @@
+ import android.content.Context;
+ import android.content.DialogInterface;
+ import android.content.Intent;
++import android.content.SharedPreferences;
+ import android.graphics.Color;
+ import android.graphics.drawable.ColorDrawable;
++import android.net.Uri;
+ import android.os.Build;
+ import android.os.Bundle;
++import android.os.Parcelable;
++import android.util.Log;
+ import android.view.View;
+ import android.view.WindowManager;
+ import android.widget.Button;
+@@ -26,30 +33,43 @@
+ import android.widget.TimePicker;
+ import android.widget.Toast;
+ 
++import java.io.Serializable;
+ import java.text.ParseException;
+ import java.text.SimpleDateFormat;
++import java.util.ArrayList;
+ import java.util.Calendar;
+ import java.util.Date;
++import java.util.List;
+ import java.util.Objects;
+ 
+ import amo.tripplanner.Helper.NotificationHelper;
+ import amo.tripplanner.R;
++import amo.tripplanner.pojo.Note;
++import amo.tripplanner.pojo.Trip;
+ import amo.tripplanner.reciver.AlarmRciever;
++import amo.tripplanner.service.FloatingWidgetService;
++import amo.tripplanner.viewmodel.TripListViewModel;
+ 
+ public class DailogActivity extends AppCompatActivity {
+ 
+     EditText editText;
+-    TextView datetx,timetx;
++    TextView datetx, timetx;
+     Button add;
+     Button repeated;
+     Button cancel;
+ 
+-    private int notificationId=1;
+-    private int mYear, mMonth, mDay,currentHour,currentMin;
++    private int notificationId = 1;
++    private int mYear, mMonth, mDay, currentHour, currentMin;
+     private String amPm;
++    private boolean isRestarted = false;
+ 
+     private long timeInMilliseconds;
+     private long dateInMilliseconds;
++    private TripListViewModel listViewModels;
++    private Trip trip = new Trip();
++    private int tripId;
++    private String tripName;
++    private List<Note> noteList = new ArrayList<>();
+ 
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+@@ -57,229 +77,77 @@
+         setContentView(R.layout.activity_dailog);
+ 
+ 
+-        openDialog(this);
+-        // Create the object of
+-        // AlertDialog Builder class
+-//        AlertDialog.Builder builder
+-//                = new AlertDialog
+-//                .Builder(DailogActivity.this);
+-//
+-//        // Set the message show for the Alert time
+-//        builder.setMessage("Do you want to exit ?");
+-//
+-//        // Set Alert Title
+-//        builder.setTitle("Alert !");
+-//
+-//        // Set Cancelable false
+-//        // for when the user clicks on the outside
+-//        // the Dialog Box then it will remain show
+-//        builder.setCancelable(false);
+-//
+-//        // Set the positive button with yes name
+-//        // OnClickListener method is use of
+-//        // DialogInterface interface.
+-//
+-//        builder
+-//                .setPositiveButton(
+-//                        "Yes",
+-//                        new DialogInterface
+-//                                .OnClickListener() {
+-//
+-//                            @Override
+-//                            public void onClick(DialogInterface dialog,
+-//                                                int which)
+-//                            {
+-//
+-//                                // When the user click yes button
+-//                                // then app will close
+-//                                finish();
+-//                            }
+-//                        });
+-//
+-//        // Set the Negative button with No name
+-//        // OnClickListener method is use
+-//        // of DialogInterface interface.
+-//        builder
+-//                .setNegativeButton(
+-//                        "No",
+-//                        new DialogInterface
+-//                                .OnClickListener() {
+-//
+-//                            @Override
+-//                            public void onClick(DialogInterface dialog,
+-//                                                int which)
+-//                            {
+-//
+-//                                // If user click no
+-//                                // then dialog box is canceled.
+-//                                dialog.cancel();
+-//                            }
+-//                        });
+-//
+-//        // Create the Alert dialog
+-//        AlertDialog alertDialog = builder.create();
+-//        Objects.requireNonNull(alertDialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+-//        // Show the Alert Dialog box
+-//        alertDialog.show();
+-
+-//        openDialog(this);
+-//        editText=findViewById(R.id.id_edit_name);
+-//        timetx=findViewById(R.id.time);
+-////        datetx=findViewById(R.id.id_date);
+-//        add=findViewById(R.id.bottomAdd);
+-//        repeated=findViewById(R.id.id_repeated);
+-//        cancel=findViewById(R.id.id_cancel);
++        int tripId = getIntent().getIntExtra("TripID", 0);
++        Log.i("DailogActivity", "onCreate: TripID: " + tripId);
++
++        listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
++
++        listViewModels.getTripById(tripId).observe(this, trips -> {
++            trip = trips;
++            if (!isRestarted) {
++                saveOnSharedPreference();
++                isRestarted = true;
++                Log.i("isRestarted", "onCreate: "+isRestarted);
++            }
++            Log.i("isRestarted", "onCreate: "+isRestarted);
++            getDataFromSharedPreference();
++            openDialog(this);
++        });
+ 
+-//        AlarmManager alarmManager=(AlarmManager)getSystemService(Context.ALARM_SERVICE);
+-//
+-//        timetx.setOnClickListener(new View.OnClickListener() {
+-//            @Override
+-//            public void onClick(View v) {
+-//                showTimePickerDialog();
+-//            }
+-//        });
+-//
+-//        datetx.setOnClickListener(new View.OnClickListener() {
+-//            @Override
+-//            public void onClick(View v) {
+-//                showDatePickerDialog();
+-//            }
+-//        });
+-//
+-//        add.setOnClickListener(new View.OnClickListener() {
+-//            @Override
+-//            public void onClick(View v) {
+-//
+-//
+-//                Intent intent=new Intent(DailogActivity.this, AlarmRciever.class);
+-//                final PendingIntent pendingIntent=PendingIntent
+-//                        .getBroadcast(DailogActivity.this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+-//
+-//
+-//                intent.putExtra("notificationId",notificationId);
+-//                intent.putExtra("Message",editText.getText().toString());
+-//
+-//
+-//                Calendar calendar=Calendar.getInstance();
+-//
+-//                calendar.set(Calendar.YEAR,mYear);
+-//                calendar.set(Calendar.MONTH,mMonth);
+-//                calendar.set(Calendar.DAY_OF_MONTH,mDay);
+-//
+-//                calendar.set(Calendar.HOUR_OF_DAY,currentHour);
+-//                calendar.set(Calendar.MINUTE,currentMin);
+-//                calendar.set(Calendar.SECOND,0);
+-//
+-//                long alarmStartTime=calendar.getTimeInMillis();
+-//                alarmManager.set(AlarmManager.RTC_WAKEUP,alarmStartTime,pendingIntent);
+-//
+-//                Toast.makeText(DailogActivity.this, "Done", Toast.LENGTH_SHORT).show();
+-//            }
+-//
+-//        });
+-//
+-//
+-//        cancel.setOnClickListener(new View.OnClickListener() {
+-//            @Override
+-//            public void onClick(View v) {
+-//
+-//                Intent intent=new Intent(DailogActivity.this,AlarmRciever.class);
+-//                final PendingIntent pendingIntent=PendingIntent
+-//                        .getBroadcast(DailogActivity.this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+-//
+-//                alarmManager.cancel(pendingIntent);
+-//                Toast.makeText(DailogActivity.this, "Alarm cancelled", Toast.LENGTH_SHORT).show();
+-//            }
+-//        });
+ 
+ 
+-       /* repeated.setOnClickListener(new View.OnClickListener() {
+-            @Override
+-            public void onClick(View v) {
+ 
+-                Calendar calendar=Calendar.getInstance();
+ 
+-                calendar.set(Calendar.YEAR,mYear);
+-                calendar.set(Calendar.MONTH,mMonth);
+-                calendar.set(Calendar.DAY_OF_MONTH,mDay);
+-
+-                calendar.set(Calendar.HOUR_OF_DAY,currentHour);
+-                calendar.set(Calendar.MINUTE,currentMin);
+-                calendar.set(Calendar.SECOND,0);
+-                Intent intent=new Intent(getApplicationContext(),NotificationReciever.class);
+-
+-                PendingIntent pendingIntent=PendingIntent.getBroadcast(MainActivity.this,100,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+-
++        TripListViewModel listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
++        listViewModels.getNoteById(tripId).observe(this, trip -> {
++            noteList = trip.getTripNotes();
++            for(Note note:noteList){
++                Log.i("FloatingWidgetService", "onStartCommand: "+note);
+             }
+-        });*/
++        });
+ 
+ 
+-    }
+ 
+-    private void showDatePickerDialog() {
+-        Calendar cal = Calendar.getInstance();
+-        mYear = cal.get(Calendar.YEAR);
+-        mMonth = cal.get(Calendar.MONTH);
+-        mDay = cal.get(Calendar.DAY_OF_MONTH);
+ 
+-        DatePickerDialog dialog = new DatePickerDialog(DailogActivity.this, android.R.style.Theme_Holo_Light_Dialog, new DatePickerDialog.OnDateSetListener() {
+-            @SuppressLint("SimpleDateFormat")
+-            @Override
+-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+-                int months= month+1;
+-                Date date = null;
+-                try {
+-                    date = new SimpleDateFormat("dd/MM/yyyy").parse(dayOfMonth + "/" + months + "/" + year);
+-                } catch (ParseException e) {
+-                    e.printStackTrace();
+-                }
+-                if (date != null) {
+-                    datetx.setText(new SimpleDateFormat("dd / MM / yyyy").format(date));
+-                    dateInMilliseconds = date.getTime();
+-                }
+-                mYear=year;
+-                mMonth=month;
+-                mDay=dayOfMonth;
+ 
+-            }
+-        }, mYear, mMonth, mDay);
++    }
+ 
+-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+-        dialog.show();
++    private void saveOnSharedPreference() {
++        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
++        SharedPreferences.Editor editor = preferences.edit();
++        editor.putInt("TripId", trip.getTripId());
++        editor.putString("TripName", trip.getTripName());
++        editor.commit();
+     }
+ 
+-    private void showTimePickerDialog() {
+-        Calendar calendar = Calendar.getInstance();
+-        currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+-        currentMin = calendar.get(Calendar.MINUTE);
+-
+-        TimePickerDialog timePickerDialog = new TimePickerDialog(DailogActivity.this, android.R.style.Theme_Holo_Light_Dialog, new TimePickerDialog.OnTimeSetListener() {
+-            @Override
+-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+-                if (hourOfDay>=12){
+-                    amPm="PM";
+-                }else {
+-                    amPm="AM";
+-                }
+-                timetx.setText(String.format("%02d:%02d",hourOfDay,minute)+amPm);
+-                currentHour=hourOfDay;
+-                currentMin=minute;
+-            }
+-        },currentHour,currentMin,false);
+-        timePickerDialog.show();
++    private void getDataFromSharedPreference() {
++        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
++        tripId = preferences.getInt("TripId", 0);
++        tripName = preferences.getString("TripName", "TripName");
+     }
+ 
+     @SuppressLint("ObsoleteSdkInt")
+-    public static void openDialog(Context context){
++    public void openDialog(Context context) {
+ 
+-        AlertDialog.Builder builder1=new AlertDialog.Builder(context);
+-        builder1.setTitle("TRIP TO DO");
+-        builder1.setMessage("It's time for your  trip");
++        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
++        builder1.setTitle(tripName);
++        builder1.setMessage("It's time for your  trip " + tripName);
+         builder1.setCancelable(false);
+         builder1.setPositiveButton("START", new DialogInterface.OnClickListener() {
+             @Override
+             public void onClick(DialogInterface dialog, int which) {
+ 
++                double latitude1 = trip.getTripStartLocation().getLatitude();
++                double longitude1 = trip.getTripStartLocation().getLongitude();
++                double latitude2 = trip.getTripEndLocation().getLatitude();
++                double longitude2 = trip.getTripEndLocation().getLongitude();
++
++                String uri = "http://maps.google.com/maps?f=d&hl=en&saddr="+latitude1+","+longitude1+"&daddr="+latitude2+","+longitude2;
++                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
++                context.startActivity(Intent.createChooser(intent, "Select an application"));
++                Intent intent1 = new Intent(getBaseContext(), FloatingWidgetService.class);
++                intent1.putExtra("ListNotes", (Serializable) noteList);
++                startService(intent1);
+             }
+         });
+ 
+@@ -295,19 +163,18 @@
+             @Override
+             public void onClick(DialogInterface dialog, int which) {
+                 NotificationHelper notificationHelper = new NotificationHelper(context);
+-                NotificationCompat.Builder nb = notificationHelper.getChannelNotification();
++                NotificationCompat.Builder nb = notificationHelper.getChannelNotification(tripName);
+                 notificationHelper.getManager().notify(1, nb.build());
+             }
+         });
+ 
+-        AlertDialog dialog=builder1.create();
+-        if(dialog.getWindow()!=null){
++        AlertDialog dialog = builder1.create();
++        if (dialog.getWindow() != null) {
+             int type;
+-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT){
+-                type= WindowManager.LayoutParams.TYPE_TOAST;
+-            }
+-            else{
+-                type= WindowManager.LayoutParams.TYPE_PHONE;
++            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
++                type = WindowManager.LayoutParams.TYPE_TOAST;
++            } else {
++                type = WindowManager.LayoutParams.TYPE_PHONE;
+             }
+             dialog.getWindow().setType(type);
+             Objects.requireNonNull(dialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+@@ -315,4 +182,10 @@
+         }
+ 
+     }
++
++    @Override
++    protected void onRestart() {
++        super.onRestart();
++        isRestarted = true;
++    }
+ }
+\ No newline at end of file
+Index: app/src/main/res/layout/overlay_layout.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<RelativeLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:id=\"@+id/layout\"\r\n    android:layout_width=\"wrap_content\"\r\n    android:layout_height=\"wrap_content\"\r\n    android:clickable=\"true\"\r\n    android:orientation=\"vertical\"\r\n    android:visibility=\"visible\"\r\n    android:focusable=\"true\">\r\n\r\n\r\n    <de.hdodenhof.circleimageview.CircleImageView\r\n        android:id=\"@+id/fabHead\"\r\n        android:layout_width=\"50dp\"\r\n        android:layout_height=\"50dp\"\r\n        android:src=\"@drawable/index\"\r\n        android:background=\"@android:color/white\"\r\n        app:fabSize=\"normal\"/>\r\n\r\n\r\n    <LinearLayout\r\n        android:id=\"@+id/expanded_view\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\"\r\n        android:orientation=\"vertical\"\r\n        android:padding=\"16dp\"\r\n        android:layout_below=\"@id/fabHead\"\r\n        android:background=\"@color/Black\">\r\n\r\n        <ImageView\r\n            android:id=\"@+id/note_img_close\"\r\n            android:layout_width=\"40dp\"\r\n            android:layout_height=\"40dp\"\r\n            android:src=\"@drawable/ic_close\"\r\n            android:layout_gravity=\"end\"\r\n            android:layout_marginBottom=\"8dp\"/>\r\n\r\n        <EditText\r\n            android:id=\"@+id/note_edTxtVw_body\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"50dp\"\r\n            android:background=\"@android:drawable/editbox_background\"\r\n            android:hint=\"@string/enter_text\" />\r\n\r\n\r\n        <LinearLayout\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginTop=\"8dp\"\r\n            android:orientation=\"horizontal\">\r\n\r\n\r\n            <Button\r\n                android:id=\"@+id/note_btn_add\"\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"40dp\"\r\n                android:background=\"@drawable/background_btn_create\"\r\n                android:layout_weight=\"1\"\r\n                android:textColor=\"@android:color/white\"\r\n                android:text=\"@string/add\" />\r\n\r\n            <Button\r\n                android:layout_marginStart=\"8dp\"\r\n                android:id=\"@+id/note_btn_reset\"\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"40dp\"\r\n                android:background=\"@drawable/background_btn_cancel\"\r\n                android:layout_weight=\"1\"\r\n                android:text=\"@string/reset\" />\r\n\r\n\r\n        </LinearLayout>\r\n\r\n\r\n        <androidx.recyclerview.widget.RecyclerView\r\n            android:id=\"@+id/recyclerView\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"match_parent\"\r\n            android:layout_marginTop=\"8dp\"\r\n            tools:listitem=\"@layout/item_note\" />\r\n\r\n\r\n    </LinearLayout>\r\n\r\n\r\n</RelativeLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/overlay_layout.xml	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/res/layout/overlay_layout.xml	(date 1611009481976)
+@@ -27,55 +27,11 @@
+         android:orientation="vertical"
+         android:padding="16dp"
+         android:layout_below="@id/fabHead"
+-        android:background="@color/Black">
+-
+-        <ImageView
+-            android:id="@+id/note_img_close"
+-            android:layout_width="40dp"
+-            android:layout_height="40dp"
+-            android:src="@drawable/ic_close"
+-            android:layout_gravity="end"
+-            android:layout_marginBottom="8dp"/>
+-
+-        <EditText
+-            android:id="@+id/note_edTxtVw_body"
+-            android:layout_width="match_parent"
+-            android:layout_height="50dp"
+-            android:background="@android:drawable/editbox_background"
+-            android:hint="@string/enter_text" />
+-
+-
+-        <LinearLayout
+-            android:layout_width="match_parent"
+-            android:layout_height="wrap_content"
+-            android:layout_marginTop="8dp"
+-            android:orientation="horizontal">
+-
+-
+-            <Button
+-                android:id="@+id/note_btn_add"
+-                android:layout_width="wrap_content"
+-                android:layout_height="40dp"
+-                android:background="@drawable/background_btn_create"
+-                android:layout_weight="1"
+-                android:textColor="@android:color/white"
+-                android:text="@string/add" />
+-
+-            <Button
+-                android:layout_marginStart="8dp"
+-                android:id="@+id/note_btn_reset"
+-                android:layout_width="wrap_content"
+-                android:layout_height="40dp"
+-                android:background="@drawable/background_btn_cancel"
+-                android:layout_weight="1"
+-                android:text="@string/reset" />
+-
+-
+-        </LinearLayout>
++        android:background="@android:color/white">
+ 
+ 
+         <androidx.recyclerview.widget.RecyclerView
+-            android:id="@+id/recyclerView"
++            android:id="@+id/recyclerViewOver"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:layout_marginTop="8dp"
+Index: app/src/main/java/amo/tripplanner/ui/home/AddTripFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.ui.home;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.app.Activity;\r\nimport android.app.AlarmManager;\r\nimport android.app.DatePickerDialog;\r\nimport android.app.PendingIntent;\r\nimport android.app.TimePickerDialog;\r\nimport android.content.Intent;\r\nimport android.graphics.Color;\r\nimport android.graphics.drawable.ColorDrawable;\r\nimport android.os.Build;\r\nimport android.os.Bundle;\r\n\r\n\r\nimport androidx.activity.OnBackPressedCallback;\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.annotation.RequiresApi;\r\nimport androidx.databinding.DataBindingUtil;\r\nimport androidx.fragment.app.Fragment;\r\nimport androidx.lifecycle.ViewModelProviders;\r\nimport androidx.navigation.Navigation;\r\n\r\nimport android.util.Log;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.AdapterView;\r\nimport android.widget.ArrayAdapter;\r\nimport android.widget.CompoundButton;\r\nimport android.widget.DatePicker;\r\nimport android.widget.TimePicker;\r\nimport android.widget.Toast;\r\n\r\n\r\nimport com.mapbox.geojson.Point;\r\nimport com.mapbox.mapboxsdk.Mapbox;\r\nimport com.mapbox.mapboxsdk.geometry.LatLng;\r\nimport com.mapbox.mapboxsdk.plugins.places.autocomplete.PlaceAutocomplete;\r\nimport com.mapbox.mapboxsdk.plugins.places.autocomplete.model.PlaceOptions;\r\n\r\nimport java.text.ParseException;\r\nimport java.text.SimpleDateFormat;\r\nimport java.util.ArrayList;\r\nimport java.util.Calendar;\r\nimport java.util.Date;\r\nimport java.util.List;\r\nimport java.util.Objects;\r\n\r\nimport amo.tripplanner.R;\r\nimport amo.tripplanner.databinding.LayoutAddTripBinding;\r\nimport amo.tripplanner.pojo.Location;\r\nimport amo.tripplanner.pojo.Note;\r\nimport amo.tripplanner.pojo.Trip;\r\nimport amo.tripplanner.reciver.AlarmRciever;\r\nimport amo.tripplanner.viewmodel.TripListViewModel;\r\n\r\nimport static android.content.Context.ALARM_SERVICE;\r\n\r\n\r\npublic class AddTripFragment extends Fragment {\r\n\r\n    //vars\r\n    public static final String TAG = \"AddFragment\";\r\n    private boolean isStart;\r\n    private String[] repeats = {\"No Repeat\", \"Repeat Daily\", \"Repeat Monthly\", \"Repeat Weekly\"};\r\n    Calendar currentCalendar = Calendar.getInstance();\r\n\r\n    //Alarm\r\n    private AlarmManager alarmManager;\r\n    private int mYear, mMonth, mDay, currentHour, currentMin;\r\n    private String amPm;\r\n\r\n    //vars trip\r\n    private String tripName;\r\n    private String startAddress, endAddress;\r\n    private double startLatitude, startLongitude;\r\n    private double endLatitude, endLongitude;\r\n    private long timestamp;\r\n    private final String tripStatus = \"Upcoming\";\r\n    private boolean tripIsRound = false;\r\n    private String tripRepeat;\r\n\r\n    //vars static\r\n    private static final int REQUEST_CODE_AUTOCOMPLETE = 1;\r\n\r\n    //biding\r\n    private LayoutAddTripBinding binding;\r\n\r\n    public AddTripFragment() {\r\n        // Required empty public constructor\r\n    }\r\n\r\n\r\n    @Override\r\n    public void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        alarmManager = (AlarmManager) requireActivity().getSystemService(ALARM_SERVICE);\r\n    }\r\n\r\n    @Override\r\n    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,\r\n                             Bundle savedInstanceState) {\r\n        binding = DataBindingUtil.inflate(inflater, R.layout.layout_add_trip, container, false);\r\n\r\n        onBackPressed();\r\n\r\n        return binding.getRoot();\r\n    }\r\n\r\n\r\n    @Override\r\n    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {\r\n        super.onViewCreated(view, savedInstanceState);\r\n\r\n        // choose start location trip\r\n        binding.addTripEdTxtVwTripStartPoint.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                goToAutoComplete();\r\n                isStart = true;\r\n            }\r\n        });\r\n\r\n\r\n        // choose end location trip\r\n        binding.addTripEdTxtVwTripEndPoint.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                goToAutoComplete();\r\n            }\r\n        });\r\n\r\n\r\n        // choose date trip\r\n        binding.addTripEdTxtVwTripDate.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                showDatePickerDialog();\r\n            }\r\n        });\r\n\r\n\r\n        // choose time trip\r\n        binding.addTripEdTxtVwTripTime.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                showTimePickerDialog();\r\n            }\r\n        });\r\n\r\n\r\n        // add trip\r\n        binding.addTripBtnSave.setOnClickListener(new View.OnClickListener() {\r\n            @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)\r\n            @Override\r\n            public void onClick(View v) {\r\n\r\n                Calendar calendar = Calendar.getInstance();\r\n                calendar.set(Calendar.YEAR, mYear);\r\n                calendar.set(Calendar.MONTH, mMonth);\r\n                calendar.set(Calendar.DAY_OF_MONTH, mDay);\r\n                calendar.set(Calendar.HOUR_OF_DAY, currentHour);\r\n                calendar.set(Calendar.MINUTE, currentMin);\r\n                calendar.set(Calendar.SECOND, 0);\r\n                timestamp = calendar.getTimeInMillis();\r\n\r\n                if (binding.addTripEdTxtVwTripName.getText().toString().isEmpty()) {\r\n                    binding.addTripEdTxtVwTripName.setBackgroundResource(R.drawable.background_input_empty);\r\n                    binding.addTripEdTxtVwTripName.setError(getString(R.string.name_required));\r\n                    return;\r\n                }\r\n\r\n                if (binding.addTripEdTxtVwTripStartPoint.getText().toString().isEmpty()) {\r\n                    binding.addTripEdTxtVwTripStartPoint.setBackgroundResource(R.drawable.background_input_empty);\r\n                    binding.addTripEdTxtVwTripStartPoint.setError(getString(R.string.startPoint_required));\r\n                    return;\r\n                }\r\n\r\n                if (binding.addTripEdTxtVwTripEndPoint.getText().toString().isEmpty()) {\r\n                    binding.addTripEdTxtVwTripEndPoint.setBackgroundResource(R.drawable.background_input_empty);\r\n                    binding.addTripEdTxtVwTripEndPoint.setError(getString(R.string.endPoint_required));\r\n                    return;\r\n                }\r\n\r\n                if (binding.addTripEdTxtVwTripDate.getText().toString().isEmpty()) {\r\n                    binding.addTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);\r\n                    binding.addTripEdTxtVwTripDate.setError(getString(R.string.date_required));\r\n                    return;\r\n                }\r\n\r\n                if (binding.addTripEdTxtVwTripTime.getText().toString().isEmpty()) {\r\n                    binding.addTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);\r\n                    binding.addTripEdTxtVwTripTime.setError(getString(R.string.time_required));\r\n                    return;\r\n                }\r\n\r\n                if (timestamp < currentCalendar.getTimeInMillis()) {\r\n                    binding.addTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);\r\n                    binding.addTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);\r\n                    binding.addTripEdTxtVwTripTime.setError(getString(R.string.time_expired));\r\n                    binding.addTripEdTxtVwTripDate.setError(getString(R.string.date_expired));\r\n                    return;\r\n                }\r\n\r\n\r\n                tripName = binding.addTripEdTxtVwTripName.getText().toString();\r\n\r\n\r\n                Location startLocation = new Location(startAddress, startLatitude, startLongitude);\r\n                Location endLocation = new Location(endAddress, endLatitude, endLongitude);\r\n                List<Note> list = new ArrayList<>();\r\n                final int idAlarm = (int) System.currentTimeMillis();\r\n                turnOnAlarmManager(timestamp,idAlarm);\r\n                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list, idAlarm);\r\n\r\n                insertTrip(trip);\r\n//\r\n                Navigation.findNavController(view).popBackStack();\r\n                Toast.makeText(v.getContext(), trip.getTripId()+\"\", Toast.LENGTH_SHORT).show();\r\n                Toast.makeText(v.getContext(), \"Trip Saved\", Toast.LENGTH_SHORT).show();\r\n            }\r\n        });\r\n\r\n\r\n        // navigating to home fragment\r\n        binding.addTripBtnClose.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n\r\n                Navigation.findNavController(view).popBackStack();\r\n            }\r\n        });\r\n\r\n\r\n        // navigating to home fragment\r\n        binding.addTripImgBack.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n\r\n                Navigation.findNavController(view).popBackStack();\r\n            }\r\n        });\r\n\r\n\r\n        binding.addTripChBoxRounded.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {\r\n            @Override\r\n            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {\r\n                tripIsRound = isChecked;\r\n            }\r\n        });\r\n\r\n\r\n        binding.addTripSpnChoose.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {\r\n            @Override\r\n            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {\r\n                tripRepeat = repeats[position];\r\n            }\r\n\r\n            @Override\r\n            public void onNothingSelected(AdapterView<?> parent) {\r\n                tripRepeat = repeats[0];\r\n            }\r\n        });\r\n\r\n        //Creating the ArrayAdapter instance having the country list\r\n        ArrayAdapter aa = new ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, repeats);\r\n        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);\r\n        //Setting the ArrayAdapter data on the Spinner\r\n        binding.addTripSpnChoose.setAdapter(aa);\r\n    }\r\n\r\n\r\n    /*\r\n     * A function use to insert trip within room database\r\n     * */\r\n    private void insertTrip(Trip trip) {\r\n        // call observe\r\n        TripListViewModel listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);\r\n//         listViewModel.insert(trip);\r\n          listViewModel.insert(trip);\r\n//         listViewModel.getId();\r\n    }\r\n\r\n\r\n    /*\r\n     * A function use to create reminder\r\n     * */\r\n    @SuppressLint(\"ObsoleteSdkInt\")\r\n    private void turnOnAlarmManager(long timestamp, int alarmId) {\r\n        Intent intent = new Intent(requireContext(), AlarmRciever.class);\r\n//        intent.putExtra(\"TripID\", tripId);\r\n\r\n        final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT);\r\n\r\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {\r\n            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);\r\n        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {\r\n            alarmManager.setExact(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);\r\n        } else {\r\n            alarmManager.set(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);\r\n        }\r\n    }\r\n\r\n\r\n    /*\r\n     * A function use to open TimePickerDialog\r\n     * */\r\n    private void showTimePickerDialog() {\r\n\r\n        Calendar calendar = Calendar.getInstance();\r\n        currentHour = calendar.get(Calendar.HOUR_OF_DAY);\r\n        currentMin = calendar.get(Calendar.MINUTE);\r\n        TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), android.R.style.Theme_Holo_Light_Dialog, new TimePickerDialog.OnTimeSetListener() {\r\n            @SuppressLint({\"SetTextI18n\", \"DefaultLocale\"})\r\n            @Override\r\n            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {\r\n                if (hourOfDay >= 12) {\r\n                    amPm = \"PM\";\r\n                } else {\r\n                    amPm = \"AM\";\r\n                }\r\n                String time12 = String.format(\"%02d:%02d \", hourOfDay, minute);\r\n                binding.addTripEdTxtVwTripTime.setText(covertTimeTo12Hours(time12) + amPm);\r\n\r\n                Log.i(TAG, \"onTimeSet: time12: \" + covertTimeTo12Hours(time12));\r\n\r\n//                binding.addTripEdTxtVwTripTime.setText(covertTimeTo12Hours()+ amPm);\r\n                currentHour = hourOfDay;\r\n                currentMin = minute;\r\n\r\n            }\r\n        }, currentHour, currentMin, false);\r\n\r\n        Objects.requireNonNull(timePickerDialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));\r\n        timePickerDialog.show();\r\n    }\r\n\r\n    private String covertTimeTo12Hours(String time) {\r\n        String[] splitTime = time.split(\":\");\r\n        String time12 = splitTime[1];\r\n\r\n        switch (splitTime[0]) {\r\n            case \"12\":\r\n                return \"12:\" + time12;\r\n            case \"13\":\r\n                return \"01:\" + time12;\r\n\r\n            case \"14\":\r\n                return \"02:\" + time12;\r\n\r\n            case \"15\":\r\n                return \"03:\" + time12;\r\n\r\n            case \"16\":\r\n                return \"04:\" + time12;\r\n\r\n            case \"17\":\r\n                return \"05:\" + time12;\r\n\r\n            case \"18\":\r\n                return \"06:\" + time12;\r\n            case \"19\":\r\n                return \"07:\" + time12;\r\n            case \"20\":\r\n                return \"08:\" + time12;\r\n            case \"21\":\r\n                return \"09:\" + time12;\r\n            case \"22\":\r\n                return \"10:\" + time12;\r\n            case \"23\":\r\n                return \"11:\" + time12;\r\n        }\r\n        return time;\r\n    }\r\n\r\n\r\n    /*\r\n     * A function use to open DatePickerDialog\r\n     * */\r\n    private void showDatePickerDialog() {\r\n        Calendar cal = Calendar.getInstance();\r\n        mYear = cal.get(Calendar.YEAR);\r\n        mMonth = cal.get(Calendar.MONTH);\r\n        mDay = cal.get(Calendar.DAY_OF_MONTH);\r\n\r\n        DatePickerDialog dialog = new DatePickerDialog(requireContext(), android.R.style.Theme_Holo_Light_Dialog, new DatePickerDialog.OnDateSetListener() {\r\n            @SuppressLint(\"SimpleDateFormat\")\r\n            @Override\r\n            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {\r\n                int months = month + 1;\r\n                Date date = null;\r\n                try {\r\n                    date = new SimpleDateFormat(\"dd/MM/yyyy\").parse(dayOfMonth + \"/\" + months + \"/\" + year);\r\n                } catch (ParseException e) {\r\n                    e.printStackTrace();\r\n                }\r\n                if (date != null) {\r\n                    binding.addTripEdTxtVwTripDate.setText(new SimpleDateFormat(\"dd / MM / yyyy\").format(date));\r\n                }\r\n                mYear = year;\r\n                mMonth = month;\r\n                mDay = dayOfMonth;\r\n\r\n            }\r\n        }, mYear, mMonth, mDay);\r\n\r\n        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));\r\n        dialog.show();\r\n    }\r\n\r\n\r\n    /*\r\n     * A function use to open Fragment PlaceAutocomplete\r\n     * */\r\n    private void goToAutoComplete() {\r\n        Intent intent = new PlaceAutocomplete.IntentBuilder()\r\n                .accessToken(Mapbox.getAccessToken() != null ? Mapbox.getAccessToken() : getString(R.string.access_token))\r\n                .placeOptions(PlaceOptions.builder()\r\n                        .backgroundColor(Color.parseColor(\"#EEEEEE\"))\r\n                        .limit(10)\r\n                        .build(PlaceOptions.MODE_CARDS))\r\n                .build(getActivity());\r\n        startActivityForResult(intent, REQUEST_CODE_AUTOCOMPLETE);\r\n    }\r\n\r\n\r\n    @Override\r\n    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {\r\n        super.onActivityResult(requestCode, resultCode, data);\r\n        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_AUTOCOMPLETE) {\r\n\r\n            assert data != null;\r\n\r\n            String address = PlaceAutocomplete.getPlace(data).placeName();\r\n\r\n            LatLng latLng = new LatLng(((Point) Objects.requireNonNull(PlaceAutocomplete.getPlace(data).geometry())).latitude(),\r\n                    ((Point) Objects.requireNonNull(PlaceAutocomplete.getPlace(data).geometry())).longitude());\r\n\r\n            if (isStart) {\r\n                startAddress = address;\r\n                startLatitude = latLng.getLatitude();\r\n                startLongitude = latLng.getLongitude();\r\n                binding.addTripEdTxtVwTripStartPoint.setText(startAddress);\r\n                isStart = false;\r\n            } else {\r\n                endAddress = address;\r\n                endLatitude = latLng.getLatitude();\r\n                endLongitude = latLng.getLongitude();\r\n                binding.addTripEdTxtVwTripEndPoint.setText(endAddress);\r\n            }\r\n        }\r\n    }\r\n\r\n    private void onBackPressed() {\r\n        OnBackPressedCallback callback = new OnBackPressedCallback(true) {\r\n            @Override\r\n            public void handleOnBackPressed() {\r\n                Navigation.findNavController(requireView()).popBackStack();\r\n            }\r\n        };\r\n        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/ui/home/AddTripFragment.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/ui/home/AddTripFragment.java	(date 1611002526891)
+@@ -213,12 +213,9 @@
+                 List<Note> list = new ArrayList<>();
+                 final int idAlarm = (int) System.currentTimeMillis();
+                 turnOnAlarmManager(timestamp,idAlarm);
+-                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list, idAlarm);
+-
++                Trip trip = new Trip(idAlarm,tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list);
+                 insertTrip(trip);
+-//
+                 Navigation.findNavController(view).popBackStack();
+-                Toast.makeText(v.getContext(), trip.getTripId()+"", Toast.LENGTH_SHORT).show();
+                 Toast.makeText(v.getContext(), "Trip Saved", Toast.LENGTH_SHORT).show();
+             }
+         });
+@@ -288,11 +285,11 @@
+      * A function use to create reminder
+      * */
+     @SuppressLint("ObsoleteSdkInt")
+-    private void turnOnAlarmManager(long timestamp, int alarmId) {
++    private void turnOnAlarmManager(long timestamp, int tripId) {
+         Intent intent = new Intent(requireContext(), AlarmRciever.class);
+-//        intent.putExtra("TripID", tripId);
++        intent.putExtra("TripID", tripId);
+ 
+-        final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
++        final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), tripId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+ 
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
+Index: app/src/main/java/amo/tripplanner/ui/home/HomeFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.ui.home;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.app.AlarmManager;\r\nimport android.app.PendingIntent;\r\nimport android.content.Intent;\r\nimport android.net.Uri;\r\nimport android.os.Build;\r\nimport android.os.Bundle;\r\n\r\nimport androidx.activity.OnBackPressedCallback;\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.databinding.DataBindingUtil;\r\nimport androidx.drawerlayout.widget.DrawerLayout;\r\nimport androidx.fragment.app.Fragment;\r\nimport androidx.lifecycle.ViewModelProviders;\r\nimport androidx.navigation.Navigation;\r\nimport androidx.recyclerview.widget.ItemTouchHelper;\r\nimport androidx.recyclerview.widget.LinearLayoutManager;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\nimport android.provider.Settings;\r\nimport android.view.LayoutInflater;\r\nimport android.view.MenuItem;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.Toast;\r\n\r\nimport com.google.android.material.navigation.NavigationView;\r\nimport com.mapbox.mapboxsdk.Mapbox;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\nimport amo.tripplanner.Helper.FirebaseHelper;\r\nimport amo.tripplanner.R;\r\nimport amo.tripplanner.adapter.TripListAdapter;\r\nimport amo.tripplanner.databinding.FragmentHomeBinding;\r\nimport amo.tripplanner.pojo.Trip;\r\nimport amo.tripplanner.reciver.AlarmRciever;\r\nimport amo.tripplanner.viewmodel.TripListViewModel;\r\nimport timber.log.Timber;\r\n\r\nimport static android.content.Context.ALARM_SERVICE;\r\n\r\n\r\npublic class HomeFragment extends Fragment {\r\n\r\n    DrawerLayout drawerLayout;\r\n    NavigationView navigationView;\r\n\r\n\r\n    private FragmentHomeBinding bindingHome;\r\n\r\n    private TripListAdapter adapter;\r\n\r\n    private TripListViewModel listViewModel;\r\n\r\n    private List<Trip> tripList = new ArrayList<>();\r\n\r\n    public HomeFragment() {\r\n        // Required empty public constructor\r\n    }\r\n\r\n    @Override\r\n    public void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        Timber.i(\"onCreate: started.\");\r\n\r\n        Mapbox.getInstance(requireContext(), getString(R.string.access_token));\r\n    }\r\n\r\n    @Override\r\n    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,\r\n                             Bundle savedInstanceState) {\r\n\r\n        bindingHome = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);\r\n\r\n        onBackPressed();\r\n\r\n\r\n        drawerLayout = bindingHome.drawerLayout;\r\n\r\n        bindingHome.navView.getMenu().getItem(4).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {\r\n            @Override\r\n            public boolean onMenuItemClick(MenuItem item) {\r\n                FirebaseHelper.getInstance(getContext()).logOut();\r\n                Navigation.findNavController(getView()).navigate(R.id.action_homeFragment_to_loginFragment);\r\n                return false;\r\n            }\r\n        });\r\n        bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                drawerLayout.open();\r\n            }\r\n        });\r\n\r\n        bindingHome.idRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));\r\n\r\n        adapter = new TripListAdapter(getContext());\r\n        bindingHome.idRecyclerView.setAdapter(adapter);\r\n\r\n        listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);\r\n        listViewModel.getAllTrips().observe(getViewLifecycleOwner(), trips -> {\r\n            tripList = trips;\r\n            adapter.setTrips(tripList);\r\n        });\r\n\r\n        deleteItemBySwabbing();\r\n\r\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {\r\n            if (!Settings.canDrawOverlays(getContext())){\r\n                getPermission();\r\n            }\r\n        }\r\n\r\n        bindingHome.idBtnAddTrip.setOnClickListener(v -> Navigation.findNavController(container).navigate(R.id.action_homeFragment_to_addFragmentFragment));\r\n//        bindingHome.idBtnAddTrip.setOnClickListener(new View.OnClickListener() {\r\n//            @Override\r\n//            public void onClick(View v) {\r\n////                FirebaseHelper.getInstance(requireContext()).syncWithBackend(tripList);\r\n//                Navigation.findNavController(container).navigate(R.id.action_homeFragment_to_historyFragment);\r\n//            }\r\n//        });\r\n        return bindingHome.getRoot();\r\n    }\r\n\r\n\r\n    @Override\r\n    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {\r\n        super.onViewCreated(view, savedInstanceState);\r\n\r\n\r\n       /* bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(v -> {\r\n//               bindingHome.drawer.open();\r\n        });*/\r\n\r\n    }\r\n\r\n    private void deleteItemBySwabbing() {\r\n        // Delete subject by swabbing item left and right\r\n        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {\r\n            @Override\r\n            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {\r\n                return false;\r\n            }\r\n\r\n            @SuppressLint(\"NewApi\")\r\n            @Override\r\n            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {\r\n                int position = viewHolder.getAdapterPosition();\r\n                final Trip trip = adapter.getItem(position);\r\n                assert trip != null;\r\n                cancelAlarm(trip.getIdAlarm());\r\n                listViewModel.delete(trip);\r\n            }\r\n        });\r\n        itemTouchHelper.attachToRecyclerView(bindingHome.idRecyclerView);\r\n    }\r\n\r\n    private void onBackPressed() {\r\n        OnBackPressedCallback callback = new OnBackPressedCallback(true) {\r\n            @Override\r\n            public void handleOnBackPressed() {\r\n                requireActivity().finish();\r\n            }\r\n        };\r\n        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);\r\n    }\r\n\r\n    public  void getPermission(){\r\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getContext())){\r\n            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse(\"package:\"+ requireActivity().getPackageName()));\r\n            startActivityForResult(intent, 1);\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {\r\n        super.onActivityResult(requestCode, resultCode, data);\r\n        if(requestCode == 1){\r\n            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {\r\n                if(!Settings.canDrawOverlays(getContext())){\r\n                    Toast.makeText(getContext(), \"permission denied by user.\", Toast.LENGTH_SHORT).show();\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    private void cancelAlarm(int id){\r\n        AlarmManager alarmManager = (AlarmManager) requireActivity().getSystemService(ALARM_SERVICE);\r\n        Intent intent=new Intent(requireActivity(), AlarmRciever.class);\r\n        final PendingIntent pendingIntent=PendingIntent\r\n                .getBroadcast(requireContext(),id,intent,PendingIntent.FLAG_CANCEL_CURRENT);\r\n        alarmManager.cancel(pendingIntent);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/ui/home/HomeFragment.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/ui/home/HomeFragment.java	(date 1611002768029)
+@@ -153,7 +153,7 @@
+                 int position = viewHolder.getAdapterPosition();
+                 final Trip trip = adapter.getItem(position);
+                 assert trip != null;
+-                cancelAlarm(trip.getIdAlarm());
++                cancelAlarm(trip.getTripId());
+                 listViewModel.delete(trip);
+             }
+         });
+Index: app/src/main/java/amo/tripplanner/pojo/Note.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.pojo;\r\n\r\npublic class Note {\r\n\r\n    private String body;\r\n    private boolean isChecked;\r\n\r\n\r\n    public Note(String body) {\r\n        this.body = body;\r\n    }\r\n\r\n\r\n    public Note() {\r\n    }\r\n\r\n\r\n    public Note(String body, boolean isChecked) {\r\n        this.body = body;\r\n        this.isChecked = isChecked;\r\n    }\r\n\r\n\r\n    public boolean isChecked() {\r\n        return isChecked;\r\n    }\r\n\r\n\r\n    public void setChecked(boolean checked) {\r\n        isChecked = checked;\r\n    }\r\n\r\n\r\n    public String getBody() {\r\n        return body;\r\n    }\r\n\r\n\r\n    public void setBody(String body) {\r\n        this.body = body;\r\n    }\r\n\r\n\r\n    @Override\r\n    public String toString() {\r\n        return \"Note{\" +\r\n                \"body='\" + body + '\\'' +\r\n//                \", isChecked=\" + isChecked +\r\n                '}';\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/pojo/Note.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/pojo/Note.java	(date 1611009937199)
+@@ -1,6 +1,11 @@
+ package amo.tripplanner.pojo;
+ 
+-public class Note {
++import android.os.Parcel;
++import android.os.Parcelable;
++
++import java.io.Serializable;
++
++public class Note implements Serializable {
+ 
+     private String body;
+     private boolean isChecked;
+@@ -21,6 +26,12 @@
+     }
+ 
+ 
++    protected Note(Parcel in) {
++        body = in.readString();
++        isChecked = in.readByte() != 0;
++    }
++
++
+     public boolean isChecked() {
+         return isChecked;
+     }
+@@ -48,4 +59,5 @@
+ //                ", isChecked=" + isChecked +
+                 '}';
+     }
++
+ }
+\ No newline at end of file
+Index: app/src/main/java/amo/tripplanner/adapter/TripListAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.adapter;\r\n\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.net.Uri;\r\nimport android.util.Log;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.databinding.DataBindingUtil;\r\nimport androidx.navigation.Navigation;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\n\r\nimport java.text.SimpleDateFormat;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\nimport amo.tripplanner.R;\r\nimport amo.tripplanner.databinding.ItemTripBinding;\r\nimport amo.tripplanner.pojo.Trip;\r\nimport amo.tripplanner.service.FloatingWidgetService;\r\nimport amo.tripplanner.ui.home.HomeFragmentDirections;\r\n\r\npublic class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripViewHolder> {\r\n\r\n    Context context;\r\n    private static final String TAG = \"TripListAdapter\";\r\n    private List<Trip> trips = new ArrayList<>();\r\n\r\n    private OnItemClickListener mListener;\r\n    private View view;\r\n\r\n    public interface OnItemClickListener {\r\n        void onItemClick(int position);\r\n    }\r\n\r\n    public void setOnItemClickListener(OnItemClickListener listener) {\r\n        mListener = listener;\r\n    }\r\n\r\n    public TripListAdapter(Context context) {\r\n        this.context = context;\r\n    }\r\n\r\n    @NonNull\r\n    @Override\r\n    public TripViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {\r\n        view = parent;\r\n        ItemTripBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_trip, parent, false);\r\n\r\n        return new TripViewHolder(itemBinding);\r\n    }\r\n\r\n    @SuppressLint({\"LogNotTimber\", \"SetTextI18n\"})\r\n    @Override\r\n    public void onBindViewHolder(@NonNull TripViewHolder holder, int position) {\r\n\r\n        if (trips.isEmpty()) {\r\n            Log.i(TAG, \"onBindViewHolder: my list is empty\");\r\n            return;\r\n        }\r\n\r\n        Trip item = trips.get(position);\r\n        holder.itemBinding.itemTxtVwName.setText(item.getTripName());\r\n        holder.itemBinding.itemTxtVwStartPoint.setText(item.getTripStartLocation().getAddress());\r\n        holder.itemBinding.itemTxtVwEndPoint.setText(item.getTripEndLocation().getAddress());\r\n        holder.itemBinding.itemTxtVwStatus.setText(item.getTripStatus());\r\n        long time = item.getTripTimestamp();\r\n        @SuppressLint(\"SimpleDateFormat\")\r\n        String s = new SimpleDateFormat(\"dd/MM/yyyy HH:mm aa\").format(time);\r\n        String[] timeDate = s.split(\" \");\r\n        String dateTxt = timeDate[0];\r\n        String timeTxt = timeDate[1];\r\n        String amPmTxt = timeDate[2];\r\n        Log.i(TAG, \"onBindViewHolder: item.getTripStatus() \" + s);\r\n        holder.itemBinding.itemTxtVwTime.setText(covertTimeTo12Hours(timeTxt) + \" \" + amPmTxt);\r\n        holder.itemBinding.itemTxtVwDate.setText(dateTxt);\r\n\r\n\r\n        holder.itemBinding.itemTxtVwTripMenu.setOnClickListener(v -> {\r\n            HomeFragmentDirections.ActionHomeFragmentToEditTripFragment action = HomeFragmentDirections.actionHomeFragmentToEditTripFragment();\r\n            action.setId(item.getTripId());\r\n            action.setName(item.getTripName());\r\n            action.setStartPoint(item.getTripStartLocation().getAddress());\r\n            action.setEndPoint(item.getTripEndLocation().getAddress());\r\n            action.setTimestamp(item.getTripTimestamp());\r\n            action.setIsRounded(item.isTripIsRound());\r\n            action.setRepeat(item.getTripRepeat());\r\n            Navigation.findNavController(view).navigate(action);\r\n        });\r\n\r\n\r\n        holder.itemBinding.ItemLinearLayout.setOnClickListener(view -> {\r\n            if (mListener != null) {\r\n                if (position != RecyclerView.NO_POSITION) {\r\n                    mListener.onItemClick(position);\r\n                }\r\n            }\r\n        });\r\n\r\n\r\n        holder.itemBinding.itemBtnStartTrip.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                double latitude1 = item.getTripStartLocation().getLatitude();\r\n                double longitude1 = item.getTripStartLocation().getLongitude();\r\n                double latitude2 = item.getTripEndLocation().getLatitude();\r\n                double longitude2 = item.getTripEndLocation().getLongitude();\r\n\r\n                String uri = \"http://maps.google.com/maps?f=d&hl=en&saddr=\"+latitude1+\",\"+longitude1+\"&daddr=\"+latitude2+\",\"+longitude2;\r\n                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));\r\n                context.startActivity(Intent.createChooser(intent, \"Select an application\"));\r\n                Intent intent1 = new Intent(v.getContext(), FloatingWidgetService.class);\r\n                v.getContext().startService(intent1);\r\n            }\r\n        });\r\n\r\n\r\n        holder.itemBinding.itemImgTripNote.setOnClickListener(v -> {\r\n            HomeFragmentDirections.ActionHomeFragmentToNoteFragment action = HomeFragmentDirections.actionHomeFragmentToNoteFragment();\r\n            action.setId(item.getTripId());\r\n            Navigation.findNavController(view).navigate(action);\r\n        });\r\n\r\n    }\r\n\r\n    private String covertTimeTo12Hours(String time) {\r\n        String[] splitTime = time.split(\":\");\r\n        String time12 = splitTime[1];\r\n\r\n        switch (splitTime[0]) {\r\n            case \"12\":\r\n                return \"12:\" + time12;\r\n            case \"13\":\r\n                return \"01:\" + time12;\r\n\r\n            case \"14\":\r\n                return \"02:\" + time12;\r\n\r\n            case \"15\":\r\n                return \"03:\" + time12;\r\n\r\n            case \"16\":\r\n                return \"04:\" + time12;\r\n\r\n            case \"17\":\r\n                return \"05:\" + time12;\r\n\r\n            case \"18\":\r\n                return \"06:\" + time12;\r\n            case \"19\":\r\n                return \"07:\" + time12;\r\n            case \"20\":\r\n                return \"08:\" + time12;\r\n            case \"21\":\r\n                return \"09:\" + time12;\r\n            case \"22\":\r\n                return \"10:\" + time12;\r\n            case \"23\":\r\n                return \"11:\" + time12;\r\n        }\r\n        return time;\r\n    }\r\n\r\n\r\n    public void setTrips(List<Trip> trips) {\r\n        this.trips = trips;\r\n        notifyDataSetChanged();\r\n    }\r\n\r\n    @Override\r\n    public int getItemCount() {\r\n        if (trips.size() != 0)\r\n            return trips.size();\r\n        else\r\n            return 0;\r\n    }\r\n\r\n    /**\r\n     * Method to get item by position.\r\n     *\r\n     * @param position\r\n     * @return\r\n     */\r\n    @Nullable\r\n    public Trip getItem(int position) {\r\n        return trips.get(position);\r\n    }\r\n\r\n    static class TripViewHolder extends RecyclerView.ViewHolder {\r\n        ItemTripBinding itemBinding;\r\n\r\n        public TripViewHolder(@NonNull ItemTripBinding itemBinding) {\r\n            super(itemBinding.getRoot());\r\n            this.itemBinding = itemBinding;\r\n        }\r\n\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/adapter/TripListAdapter.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/adapter/TripListAdapter.java	(date 1611010018842)
+@@ -17,6 +17,7 @@
+ import androidx.recyclerview.widget.RecyclerView;
+ 
+ 
++import java.io.Serializable;
+ import java.text.SimpleDateFormat;
+ import java.util.ArrayList;
+ import java.util.List;
+@@ -117,6 +118,7 @@
+                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+                 context.startActivity(Intent.createChooser(intent, "Select an application"));
+                 Intent intent1 = new Intent(v.getContext(), FloatingWidgetService.class);
++                intent1.putExtra("ListNotes", (Serializable) item.getTripNotes());
+                 v.getContext().startService(intent1);
+             }
+         });
+Index: app/src/main/java/amo/tripplanner/database/dao/TripDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.database.dao;\r\n\r\nimport androidx.lifecycle.LiveData;\r\nimport androidx.room.Dao;\r\nimport androidx.room.Delete;\r\nimport androidx.room.Insert;\r\nimport androidx.room.OnConflictStrategy;\r\nimport androidx.room.Query;\r\nimport androidx.room.Update;\r\n\r\nimport java.util.List;\r\n\r\nimport amo.tripplanner.pojo.Note;\r\nimport amo.tripplanner.pojo.Trip;\r\n\r\n@Dao\r\npublic interface TripDao {\r\n\r\n//    @Query(\"SELECT * FROM trip_table\")\r\n//    LiveData<List<Trip>> getAllTrips();\r\n\r\n\r\n    @Query(\"SELECT * FROM trip_table WHERE trip_status = 'Upcoming'\")\r\n    LiveData<List<Trip>> getAllTrips();\r\n\r\n\r\n    @Query(\"SELECT * FROM trip_table WHERE trip_id = :tripId\")\r\n    LiveData<Trip> getAllNotesById(int tripId);\r\n\r\n\r\n//    @Insert(onConflict = OnConflictStrategy.REPLACE)\r\n//    void insertTrip(Trip trip);\r\n\r\n    @Insert(onConflict = OnConflictStrategy.REPLACE)\r\n    long insertTrip(Trip trip);\r\n\r\n\r\n    @Update(onConflict = OnConflictStrategy.REPLACE)\r\n    void updateTrip(Trip trip);\r\n\r\n\r\n    @Query(\"UPDATE trip_table SET trip_note =:notes WHERE trip_id = :id\")\r\n    void updateTrip(int id, List<Note> notes);\r\n\r\n\r\n    @Query(\"UPDATE trip_table SET trip_note =:notes WHERE trip_id = :id\")\r\n    void deleteItemNote(int id, List<Note> notes);\r\n\r\n    @Delete\r\n    void deleteItemNote(Trip trip);\r\n\r\n    @Delete\r\n    void deleteTrip(Trip trip);\r\n\r\n\r\n    @Query(\"DELETE FROM trip_table\")\r\n    void deleteAll();\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/database/dao/TripDao.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/database/dao/TripDao.java	(date 1611003136280)
+@@ -27,6 +27,10 @@
+     @Query("SELECT * FROM trip_table WHERE trip_id = :tripId")
+     LiveData<Trip> getAllNotesById(int tripId);
+ 
++    @Query("SELECT * FROM trip_table WHERE trip_id = :tripId")
++    LiveData<Trip> getTripById(int tripId);
++
++
+ 
+ //    @Insert(onConflict = OnConflictStrategy.REPLACE)
+ //    void insertTrip(Trip trip);
+Index: app/src/main/java/amo/tripplanner/repository/TripRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.repository;\r\n\r\nimport android.app.Application;\r\nimport android.os.AsyncTask;\r\nimport android.util.Log;\r\n\r\nimport androidx.lifecycle.LiveData;\r\n\r\nimport java.util.List;\r\n\r\nimport amo.tripplanner.database.AppDatabase;\r\nimport amo.tripplanner.database.dao.TripDao;\r\nimport amo.tripplanner.pojo.Note;\r\nimport amo.tripplanner.pojo.Trip;\r\nimport amo.tripplanner.utilities.AppExecutors;\r\n\r\n\r\npublic class TripRepository {\r\n    private static final Object LOCK = new Object();\r\n    private static TripRepository mInstance;\r\n    private final TripDao tripDao;\r\n    long idTrip;\r\n\r\n    public long getIdTrip() {\r\n        return idTrip;\r\n    }\r\n\r\n    public void setIdTrip(long idTrip) {\r\n        this.idTrip = idTrip;\r\n    }\r\n\r\n    private LiveData<List<Trip>> listTrips;\r\n\r\n    private TripRepository(Application application) {\r\n        AppDatabase database = AppDatabase.getInstance(application);\r\n        tripDao = database.tripDao();\r\n        listTrips = tripDao.getAllTrips();\r\n    }\r\n\r\n    public static TripRepository getInstance(Application application) {\r\n\r\n        if (mInstance == null) {\r\n            synchronized (LOCK) {\r\n                mInstance = new TripRepository(application);\r\n            }\r\n        }\r\n\r\n        return mInstance;\r\n    }\r\n\r\n\r\n    public LiveData<List<Trip>> getAllTrips() {\r\n        return listTrips;\r\n    }\r\n\r\n\r\n    public LiveData<Trip> getAllNotesById(int tripId) {\r\n        return tripDao.getAllNotesById(tripId);\r\n    }\r\n\r\n\r\n    public long insert(final Trip trip) {\r\n\r\n        AppExecutors.getInstance().diskIO().execute(new Runnable() {\r\n            @Override\r\n            public void run() {\r\n//               tripDao.insertTrip(trip);\r\n                idTrip = tripDao.insertTrip(trip);\r\n                Log.i(\"RunRunRunRunRun\", \"run:1 \" + idTrip);\r\n            }\r\n        });\r\n        Log.i(\"RunRunRunRunRun\", \"run:2 \" + idTrip);\r\n        return idTrip;\r\n    }\r\n\r\n//    public long insert(final Trip trip) {\r\n//        new InsertTripAsyncTask(tripDao).execute(trip);\r\n//\r\n//        return idTrip;\r\n//    }\r\n\r\n\r\n    public void update(final Trip trip) {\r\n        AppExecutors.getInstance().diskIO().execute(new Runnable() {\r\n            @Override\r\n            public void run() {\r\n                tripDao.updateTrip(trip);\r\n            }\r\n        });\r\n    }\r\n\r\n\r\n    public void update(final int id, final List<Note> notes) {\r\n        AppExecutors.getInstance().diskIO().execute(new Runnable() {\r\n            @Override\r\n            public void run() {\r\n                tripDao.updateTrip(id, notes);\r\n            }\r\n        });\r\n    }\r\n\r\n\r\n    public void deleteItemNote(final int id, final List<Note> notes) {\r\n        AppExecutors.getInstance().diskIO().execute(new Runnable() {\r\n            @Override\r\n            public void run() {\r\n                tripDao.deleteItemNote(id, notes);\r\n            }\r\n        });\r\n    }\r\n\r\n\r\n    public void deleteItemNote(final Trip trip) {\r\n        AppExecutors.getInstance().diskIO().execute(new Runnable() {\r\n            @Override\r\n            public void run() {\r\n                tripDao.deleteItemNote(trip);\r\n            }\r\n        });\r\n    }\r\n\r\n\r\n    public void delete(final Trip trip) {\r\n        AppExecutors.getInstance().diskIO().execute(new Runnable() {\r\n            @Override\r\n            public void run() {\r\n                tripDao.deleteTrip(trip);\r\n            }\r\n        });\r\n    }\r\n\r\n    public void deleteAll() {\r\n        AppExecutors.getInstance().diskIO().execute(new Runnable() {\r\n            @Override\r\n            public void run() {\r\n                tripDao.deleteAll();\r\n            }\r\n        });\r\n    }\r\n\r\n    private class InsertTripAsyncTask extends AsyncTask<Trip, Void, Long> {\r\n\r\n        TripDao tripDao;\r\n\r\n        public InsertTripAsyncTask(TripDao tripDao) {\r\n            this.tripDao = tripDao;\r\n        }\r\n\r\n        @Override\r\n        protected Long doInBackground(Trip... trips) {\r\n//            long idTrip = tripDao.insertTrip(trips[0]);\r\n//            trips[0].setTripId((int) idTrip);\r\n            return tripDao.insertTrip(trips[0]);\r\n        }\r\n\r\n        @Override\r\n        protected void onPostExecute(Long aLong) {\r\n            super.onPostExecute(aLong);\r\n            idTrip = aLong;\r\n        }\r\n    }\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/repository/TripRepository.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/repository/TripRepository.java	(date 1611003136291)
+@@ -58,6 +58,10 @@
+         return tripDao.getAllNotesById(tripId);
+     }
+ 
++    public LiveData<Trip> getTripById(int tripId) {
++        return tripDao.getTripById(tripId);
++    }
++
+ 
+     public long insert(final Trip trip) {
+ 
+Index: app/src/main/java/amo/tripplanner/viewmodel/TripListViewModel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.viewmodel;\r\n\r\nimport android.app.Application;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.lifecycle.AndroidViewModel;\r\nimport androidx.lifecycle.LiveData;\r\n\r\nimport java.util.List;\r\n\r\nimport amo.tripplanner.pojo.Note;\r\nimport amo.tripplanner.pojo.Trip;\r\nimport amo.tripplanner.repository.TripRepository;\r\n\r\npublic class TripListViewModel extends AndroidViewModel {\r\n\r\n    private TripRepository mRepository;\r\n    private LiveData<List<Trip>> mAllTrips;\r\n\r\n    public TripListViewModel(@NonNull Application context) {\r\n        super(context);\r\n        mRepository = TripRepository.getInstance(context);\r\n        mAllTrips = mRepository.getAllTrips();\r\n    }\r\n\r\n    public LiveData<List<Trip>> getAllTrips() {\r\n        return mAllTrips;\r\n    }\r\n\r\n    public LiveData<Trip> getNoteById(int tripId) {\r\n        return mRepository.getAllNotesById(tripId);\r\n    }\r\n\r\n    public void insert(Trip trip) {\r\n       mRepository.insert(trip);\r\n    }\r\n\r\n    public long getId(){\r\n       return mRepository.getIdTrip();\r\n    }\r\n\r\n    public void update(Trip trip) {\r\n        mRepository.update(trip);\r\n    }\r\n\r\n    public void update(int id,List<Note> notes) {\r\n        mRepository.update(id,notes);\r\n    }\r\n\r\n    public void deleteItemNote(int id,List<Note> notes) {\r\n        mRepository.deleteItemNote(id,notes);\r\n    }\r\n\r\n    public void deleteItemNote(Trip trip) {\r\n        mRepository.deleteItemNote(trip);\r\n    }\r\n\r\n    public void delete(Trip trip) {\r\n        mRepository.delete(trip);\r\n    }\r\n\r\n    public void deleteAll() {\r\n        mRepository.deleteAll();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/viewmodel/TripListViewModel.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/viewmodel/TripListViewModel.java	(date 1611003136284)
+@@ -31,6 +31,10 @@
+         return mRepository.getAllNotesById(tripId);
+     }
+ 
++    public LiveData<Trip> getTripById(int tripId) {
++        return mRepository.getTripById(tripId);
++    }
++
+     public void insert(Trip trip) {
+        mRepository.insert(trip);
+     }
+Index: app/src/main/java/amo/tripplanner/Helper/NotificationHelper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.Helper;\r\n\r\nimport android.annotation.TargetApi;\r\nimport android.app.Notification;\r\nimport android.app.NotificationChannel;\r\nimport android.app.NotificationManager;\r\nimport android.app.PendingIntent;\r\nimport android.content.Context;\r\nimport android.content.ContextWrapper;\r\nimport android.content.Intent;\r\nimport android.os.Build;\r\n\r\nimport androidx.core.app.NotificationCompat;\r\n\r\nimport amo.tripplanner.R;\r\nimport amo.tripplanner.ui.DailogActivity;\r\nimport amo.tripplanner.ui.MainActivity;\r\n\r\n\r\npublic class NotificationHelper extends ContextWrapper {\r\n    public static final String channelID = \"channelID\";\r\n    public static final String channelName = \"Channel Name\";\r\n    private NotificationManager mManager;\r\n    private Context context;\r\n\r\n    public NotificationHelper(Context base) {\r\n        super(base);\r\n        context = base;\r\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {\r\n            createChannel();\r\n        }\r\n    }\r\n\r\n    @TargetApi(Build.VERSION_CODES.O)\r\n    private void createChannel() {\r\n        NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);\r\n        getManager().createNotificationChannel(channel);\r\n    }\r\n\r\n    public NotificationManager getManager() {\r\n        if (mManager == null) {\r\n            mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);\r\n        }\r\n        return mManager;\r\n    }\r\n\r\n    public NotificationCompat.Builder getChannelNotification() {\r\n        Intent mainIntent = new Intent(context, DailogActivity.class);\r\n        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);\r\n        return new NotificationCompat.Builder(getApplicationContext(), channelID)\r\n                .setContentTitle(\"Alarm!\")\r\n                .setContentText(\"Your AlarmManager is working.\")\r\n                .setOngoing(true)\r\n                .setContentIntent(pendingIntent)\r\n                .setPriority(Notification.PRIORITY_MAX)\r\n                .setDefaults(Notification.DEFAULT_ALL)\r\n                .setSmallIcon(R.drawable.ic_launcher_foreground);\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/Helper/NotificationHelper.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/Helper/NotificationHelper.java	(date 1611004485367)
+@@ -44,17 +44,17 @@
+         return mManager;
+     }
+ 
+-    public NotificationCompat.Builder getChannelNotification() {
++    public NotificationCompat.Builder getChannelNotification(String msg) {
+         Intent mainIntent = new Intent(context, DailogActivity.class);
+         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+         return new NotificationCompat.Builder(getApplicationContext(), channelID)
+-                .setContentTitle("Alarm!")
+-                .setContentText("Your AlarmManager is working.")
++                .setContentTitle(msg)
++                .setContentText("Your waiting for trip "+msg)
+                 .setOngoing(true)
+                 .setContentIntent(pendingIntent)
+                 .setPriority(Notification.PRIORITY_MAX)
+                 .setDefaults(Notification.DEFAULT_ALL)
+-                .setSmallIcon(R.drawable.ic_launcher_foreground);
++                .setSmallIcon(R.drawable.index);
+     }
+ 
+ }
+Index: app/src/main/java/amo/tripplanner/pojo/Trip.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.pojo;\r\n\r\nimport androidx.room.ColumnInfo;\r\nimport androidx.room.Entity;\r\nimport androidx.room.Ignore;\r\nimport androidx.room.PrimaryKey;\r\n\r\nimport java.util.List;\r\n\r\n@Entity(tableName = \"trip_table\")\r\npublic class Trip {\r\n\r\n    @PrimaryKey(autoGenerate = true)\r\n    @ColumnInfo(name = \"trip_id\")\r\n    private int tripId;\r\n\r\n    @ColumnInfo(name = \"trip_name\")\r\n    private String tripName;\r\n\r\n    @ColumnInfo(name = \"trip_start\")\r\n    private Location tripStartLocation;\r\n\r\n    @ColumnInfo(name = \"trip_end\")\r\n    private Location tripEndLocation;\r\n\r\n    @ColumnInfo(name = \"trip_timestamp\")\r\n    private long tripTimestamp;\r\n\r\n    @ColumnInfo(name = \"trip_status\")\r\n    private String tripStatus;\r\n\r\n    @ColumnInfo(name = \"trip_round\")\r\n    private boolean tripIsRound;\r\n\r\n    @ColumnInfo(name = \"trip_repeat\")\r\n    private String tripRepeat;\r\n\r\n    @ColumnInfo(name = \"trip_note\")\r\n    private List<Note> tripNotes;\r\n\r\n    @ColumnInfo(name = \"trip_idAlarm\")\r\n    private int idAlarm;\r\n\r\n\r\n    public Trip() {\r\n    }\r\n\r\n    public int getIdAlarm() {\r\n        return idAlarm;\r\n    }\r\n\r\n    public void setIdAlarm(int idAlarm) {\r\n        this.idAlarm = idAlarm;\r\n    }\r\n\r\n    @Ignore\r\n    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat) {\r\n        this.tripName = tripName;\r\n        this.tripStartLocation = tripStartLocation;\r\n        this.tripEndLocation = tripEndLocation;\r\n        this.tripTimestamp = tripTimestamp;\r\n        this.tripStatus = tripStatus;\r\n        this.tripIsRound = tripIsRound;\r\n        this.tripRepeat = tripRepeat;\r\n    }\r\n\r\n    @Ignore\r\n    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat, List<Note> tripNotes) {\r\n        this.tripName = tripName;\r\n        this.tripStartLocation = tripStartLocation;\r\n        this.tripEndLocation = tripEndLocation;\r\n        this.tripTimestamp = tripTimestamp;\r\n        this.tripStatus = tripStatus;\r\n        this.tripIsRound = tripIsRound;\r\n        this.tripRepeat = tripRepeat;\r\n        this.tripNotes = tripNotes;\r\n    }\r\n\r\n    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat, List<Note> tripNotes, int idAlarm) {\r\n        this.tripName = tripName;\r\n        this.tripStartLocation = tripStartLocation;\r\n        this.tripEndLocation = tripEndLocation;\r\n        this.tripTimestamp = tripTimestamp;\r\n        this.tripStatus = tripStatus;\r\n        this.tripIsRound = tripIsRound;\r\n        this.tripRepeat = tripRepeat;\r\n        this.tripNotes = tripNotes;\r\n        this.idAlarm = idAlarm;\r\n    }\r\n\r\n    public String getTripStatus() {\r\n        return tripStatus;\r\n    }\r\n\r\n    public void setTripStatus(String tripStatus) {\r\n        this.tripStatus = tripStatus;\r\n    }\r\n\r\n    public long getTripTimestamp() {\r\n        return tripTimestamp;\r\n    }\r\n\r\n    public void setTripTimestamp(long tripTimestamp) {\r\n        this.tripTimestamp = tripTimestamp;\r\n    }\r\n\r\n    public boolean isTripIsRound() {\r\n        return tripIsRound;\r\n    }\r\n\r\n    public void setTripIsRound(boolean tripIsRound) {\r\n        this.tripIsRound = tripIsRound;\r\n    }\r\n\r\n    public String getTripRepeat() {\r\n        return tripRepeat;\r\n    }\r\n\r\n    public void setTripRepeat(String tripRepeat) {\r\n        this.tripRepeat = tripRepeat;\r\n    }\r\n\r\n    public List<Note> getTripNotes() {\r\n        return tripNotes;\r\n    }\r\n\r\n    public void setTripNotes(List<Note> tripNotes) {\r\n        this.tripNotes = tripNotes;\r\n    }\r\n\r\n    public int getTripId() {\r\n        return tripId;\r\n    }\r\n\r\n    public void setTripId(int tripId) {\r\n        this.tripId = tripId;\r\n    }\r\n\r\n    public String getTripName() {\r\n        return tripName;\r\n    }\r\n\r\n    public void setTripName(String tripName) {\r\n        this.tripName = tripName;\r\n    }\r\n\r\n    public Location getTripStartLocation() {\r\n        return tripStartLocation;\r\n    }\r\n\r\n    public void setTripStartLocation(Location tripStartLocation) {\r\n        this.tripStartLocation = tripStartLocation;\r\n    }\r\n\r\n    public Location getTripEndLocation() {\r\n        return tripEndLocation;\r\n    }\r\n\r\n    public void setTripEndLocation(Location tripEndLocation) {\r\n        this.tripEndLocation = tripEndLocation;\r\n    }\r\n\r\n    @Override\r\n    public String toString() {\r\n        return \"Trip{\" +\r\n                \"tripId=\" + tripId +\r\n                \", tripName='\" + tripName + '\\'' +\r\n                \", tripStartLocation=\" + tripStartLocation +\r\n                \", tripEndLocation=\" + tripEndLocation +\r\n                \", tripTimestamp=\" + tripTimestamp +\r\n                \", tripStatus='\" + tripStatus + '\\'' +\r\n                \", tripIsRound=\" + tripIsRound +\r\n                \", tripRepeat='\" + tripRepeat + '\\'' +\r\n                '}';\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/pojo/Trip.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/pojo/Trip.java	(date 1611002425582)
+@@ -10,7 +10,7 @@
+ @Entity(tableName = "trip_table")
+ public class Trip {
+ 
+-    @PrimaryKey(autoGenerate = true)
++    @PrimaryKey
+     @ColumnInfo(name = "trip_id")
+     private int tripId;
+ 
+@@ -38,20 +38,13 @@
+     @ColumnInfo(name = "trip_note")
+     private List<Note> tripNotes;
+ 
+-    @ColumnInfo(name = "trip_idAlarm")
+-    private int idAlarm;
++//    @ColumnInfo(name = "trip_idAlarm")
++//    private int idAlarm;
+ 
+ 
+     public Trip() {
+     }
+ 
+-    public int getIdAlarm() {
+-        return idAlarm;
+-    }
+-
+-    public void setIdAlarm(int idAlarm) {
+-        this.idAlarm = idAlarm;
+-    }
+ 
+     @Ignore
+     public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat) {
+@@ -76,7 +69,7 @@
+         this.tripNotes = tripNotes;
+     }
+ 
+-    public Trip(String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat, List<Note> tripNotes, int idAlarm) {
++    public Trip(int tripId,String tripName, Location tripStartLocation, Location tripEndLocation, long tripTimestamp, String tripStatus, boolean tripIsRound, String tripRepeat, List<Note> tripNotes) {
+         this.tripName = tripName;
+         this.tripStartLocation = tripStartLocation;
+         this.tripEndLocation = tripEndLocation;
+@@ -85,7 +78,7 @@
+         this.tripIsRound = tripIsRound;
+         this.tripRepeat = tripRepeat;
+         this.tripNotes = tripNotes;
+-        this.idAlarm = idAlarm;
++        this.tripId = tripId;
+     }
+ 
+     public String getTripStatus() {
+Index: app/src/main/java/amo/tripplanner/database/AppDatabase.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.database;\r\n\r\nimport android.content.Context;\r\nimport android.util.Log;\r\n\r\nimport androidx.room.Database;\r\nimport androidx.room.Room;\r\nimport androidx.room.RoomDatabase;\r\nimport androidx.room.TypeConverters;\r\n\r\nimport amo.tripplanner.database.converter.ConverterDate;\r\nimport amo.tripplanner.database.converter.ConverterLocation;\r\nimport amo.tripplanner.database.converter.ConverterNote;\r\nimport amo.tripplanner.database.dao.TripDao;\r\nimport amo.tripplanner.pojo.Trip;\r\nimport timber.log.Timber;\r\n\r\n@Database(entities = {Trip.class}, version = 2, exportSchema = false)\r\n@TypeConverters({ConverterLocation.class, ConverterNote.class, ConverterDate.class})\r\npublic abstract class AppDatabase extends RoomDatabase {\r\n\r\n    private static final String TAG = AppDatabase.class.getSimpleName();\r\n    private static final Object LOCK = new Object();\r\n    private static final String DATABASE_NAME = \"tripssss\";\r\n    private static AppDatabase mInstance;\r\n\r\n    public static AppDatabase getInstance(Context context) {\r\n        if (mInstance == null) {\r\n            synchronized (LOCK) {\r\n                Timber.d(\"getInstance: Creating a new database instance\");\r\n                mInstance = Room.databaseBuilder(\r\n                        context.getApplicationContext(),\r\n                        AppDatabase.class,\r\n                        AppDatabase.DATABASE_NAME)\r\n                        .fallbackToDestructiveMigration()\r\n                        .build();\r\n            }\r\n        }\r\n        Timber.d(\"getInstance: Getting the database instance, no need to recreated it.\");\r\n        return mInstance;\r\n    }\r\n\r\n    public abstract TripDao tripDao();\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/database/AppDatabase.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/database/AppDatabase.java	(date 1611002526896)
+@@ -15,7 +15,7 @@
+ import amo.tripplanner.pojo.Trip;
+ import timber.log.Timber;
+ 
+-@Database(entities = {Trip.class}, version = 2, exportSchema = false)
++@Database(entities = {Trip.class}, version = 3, exportSchema = false)
+ @TypeConverters({ConverterLocation.class, ConverterNote.class, ConverterDate.class})
+ public abstract class AppDatabase extends RoomDatabase {
+ 
+Index: app/src/main/java/amo/tripplanner/reciver/AlarmRciever.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package amo.tripplanner.reciver;\r\n\r\nimport android.app.Notification;\r\nimport android.app.NotificationManager;\r\nimport android.app.PendingIntent;\r\nimport android.content.BroadcastReceiver;\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.os.Build;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.RequiresApi;\r\nimport androidx.core.app.NotificationCompat;\r\n\r\nimport amo.tripplanner.Helper.NotificationHelper;\r\nimport amo.tripplanner.R;\r\nimport amo.tripplanner.ui.DailogActivity;\r\nimport amo.tripplanner.ui.MainActivity;\r\n\r\npublic class AlarmRciever extends BroadcastReceiver {\r\n    static String msg;\r\n    Context context;\r\n    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)\r\n    @Override\r\n    public void onReceive(Context context1, Intent intent) {\r\n\r\n        context = context1;\r\n\r\n       /* if (\"android.intent.action.BOOT_COMPLETED\".equals(intent.getAction())) {\r\n            Intent serviceIntent = new Intent(context, MainActivity.class);\r\n\r\n            context.startService(serviceIntent);\r\n        }*/\r\n\r\n        Intent i = new Intent(context, DailogActivity.class);\r\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {\r\n            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);\r\n        }\r\n        context.startActivity(i);\r\n\r\n\r\n//\r\n//        Intent mainIntent = new Intent(context, MainActivity.class);\r\n//\r\n//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);\r\n//\r\n//        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);\r\n//\r\n//        Notification.Builder builder = null;\r\n//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {\r\n//            builder = new Notification.Builder(context);\r\n//            builder.setSmallIcon(R.drawable.ic_notifications)\r\n//                    .setContentTitle(\"TRIP TO DO\")\r\n//                    .setContentText(\"msg\")\r\n//                    .setWhen(System.currentTimeMillis())\r\n//                    .setOngoing(true)\r\n//                    .setContentIntent(pendingIntent)\r\n//                    .setPriority(Notification.PRIORITY_MAX)\r\n//                    .setDefaults(Notification.DEFAULT_ALL);\r\n//\r\n//            notificationManager.notify(notificationId, builder.build());\r\n//        }\r\n\r\n//        DailogActivity.openDialog(context);\r\n\r\n//\r\n//        int notificationId=intent.getIntExtra(\"notificationId\",0);\r\n//\r\n//\r\n//\r\n//        Intent i = new Intent(context, DailogActivity.class);\r\n//        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);\r\n//        context.startActivity(i);\r\n//\r\n//\r\n//        String msg=intent.getStringExtra(\"Message\");\r\n//\r\n////        Intent mainIntent=new Intent(context, MainActivity.class);\r\n////        PendingIntent pendingIntent=PendingIntent.getActivity(context,0,mainIntent,0);\r\n//\r\n//        NotificationManager notificationManager=(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);\r\n//\r\n//        Notification.Builder builder=new Notification.Builder(context);\r\n//        builder.setSmallIcon(R.drawable.ic_account)\r\n//                .setContentTitle(\"TRIP TO DO\")\r\n//                .setContentText(msg)\r\n//                .setWhen(System.currentTimeMillis())\r\n//                .setAutoCancel(true)\r\n//                .setPriority(Notification.PRIORITY_MAX)\r\n//                .setDefaults(Notification.DEFAULT_ALL);\r\n//\r\n//        notificationManager.notify(notificationId,builder.build());\r\n//\r\n//        Toast.makeText(context, \"Done\", Toast.LENGTH_SHORT).show();\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/amo/tripplanner/reciver/AlarmRciever.java	(revision d152906dec63bd4d5bf29eeb291f8878c857341e)
++++ app/src/main/java/amo/tripplanner/reciver/AlarmRciever.java	(date 1611002742490)
+@@ -7,6 +7,7 @@
+ import android.content.Context;
+ import android.content.Intent;
+ import android.os.Build;
++import android.util.Log;
+ import android.widget.Toast;
+ 
+ import androidx.annotation.RequiresApi;
+@@ -26,6 +27,9 @@
+ 
+         context = context1;
+ 
++        int tripId = intent.getIntExtra("TripID", 0);
++        Log.i("AlarmRciever", "onReceive: tripId : "+tripId);
++
+        /* if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+             Intent serviceIntent = new Intent(context, MainActivity.class);
+ 
+@@ -35,7 +39,9 @@
+         Intent i = new Intent(context, DailogActivity.class);
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
++            i.putExtra("TripID",tripId);
+         }
++
+         context.startActivity(i);
+ 
+ 

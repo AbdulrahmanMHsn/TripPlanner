@@ -213,12 +213,9 @@ public class AddTripFragment extends Fragment {
                 List<Note> list = new ArrayList<>();
                 final int idAlarm = (int) System.currentTimeMillis();
                 turnOnAlarmManager(timestamp,idAlarm);
-                Trip trip = new Trip(tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list, idAlarm);
-
+                Trip trip = new Trip(idAlarm,tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list);
                 insertTrip(trip);
-//
                 Navigation.findNavController(view).popBackStack();
-                Toast.makeText(v.getContext(), trip.getTripId()+"", Toast.LENGTH_SHORT).show();
                 Toast.makeText(v.getContext(), "Trip Saved", Toast.LENGTH_SHORT).show();
             }
         });
@@ -288,11 +285,11 @@ public class AddTripFragment extends Fragment {
      * A function use to create reminder
      * */
     @SuppressLint("ObsoleteSdkInt")
-    private void turnOnAlarmManager(long timestamp, int alarmId) {
+    private void turnOnAlarmManager(long timestamp, int tripId) {
         Intent intent = new Intent(requireContext(), AlarmRciever.class);
-//        intent.putExtra("TripID", tripId);
+        intent.putExtra("TripID", tripId);
 
-        final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), alarmId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), tripId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);

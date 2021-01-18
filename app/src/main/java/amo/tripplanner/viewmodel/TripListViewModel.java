@@ -31,6 +31,10 @@ public class TripListViewModel extends AndroidViewModel {
         return mRepository.getAllNotesById(tripId);
     }
 
+    public LiveData<Trip> getTripById(int tripId) {
+        return mRepository.getTripById(tripId);
+    }
+
     public void insert(Trip trip) {
        mRepository.insert(trip);
     }

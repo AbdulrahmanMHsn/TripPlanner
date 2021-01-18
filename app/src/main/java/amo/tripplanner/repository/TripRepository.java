@@ -58,6 +58,10 @@ public class TripRepository {
         return tripDao.getAllNotesById(tripId);
     }
 
+    public LiveData<Trip> getTripById(int tripId) {
+        return tripDao.getTripById(tripId);
+    }
+
 
     public long insert(final Trip trip) {
 
