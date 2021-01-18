@@ -1,5 +1,6 @@
 package amo.tripplanner.ui.login;
 
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Objects;
 
+import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.FragmentSignUpBinding;
 
@@ -29,7 +31,7 @@ public class SignUpFragment extends Fragment {
 
     private FragmentSignUpBinding binding;
     private FirebaseAuth auth;
-
+    private View view;
     public SignUpFragment() {
         // Required empty public constructor
     }
@@ -47,10 +49,11 @@ public class SignUpFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_sign_up, container, false);
 
+        view = container;
         binding.buttonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                registerUser();
+                register();
             }
         });
 
@@ -58,8 +61,19 @@ public class SignUpFragment extends Fragment {
         return binding.getRoot();
     }
 
+    private void register(){
+        String email = binding.editEmailSignup.getText().toString();
+        String password = binding.editPasswordSignUp.getText().toString();
+        String confirmPassword = binding.editConfirmPasswordSignUp.getText().toString();
 
-    private void registerUser(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            if (!email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty() &&(password.equals(confirmPassword))){
+                FirebaseHelper.getInstance(getContext()).signUp(email, password, getContext(), view, R.id.action_signUpFragment_to_homeFragment);
+            }
+        }
+    }
+
+    /*private void registerUser(){
         String email = binding.editEmailSignup.getText().toString();
         String password = binding.editPasswordSignUp.getText().toString();
 
@@ -103,5 +117,5 @@ public class SignUpFragment extends Fragment {
             });
         }
 
-    }
+    }*/
 }

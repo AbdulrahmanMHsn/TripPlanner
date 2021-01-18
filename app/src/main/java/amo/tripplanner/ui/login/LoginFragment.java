@@ -1,6 +1,8 @@
 package amo.tripplanner.ui.login;
 
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -17,6 +19,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
+
 import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.FragmentLoginBinding;
@@ -24,8 +36,9 @@ import amo.tripplanner.utilities.ButtonAnim;
 
 
 public class LoginFragment extends Fragment {
-
-
+    private GoogleSignInClient googleSignInClient;
+    private FirebaseAuth auth;
+    private static final int RC_SIGN_IN =1;
     private View view;
     private FragmentLoginBinding binding;
 
@@ -64,19 +77,56 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        binding.buttonLoginGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginWithGoogle();
+            }
+        });
 
-//        binding.GoogleLoginImage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
+        auth = FirebaseAuth.getInstance();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
 
+        googleSignInClient = GoogleSignIn.getClient(getContext(), gso);
 
         return binding.getRoot();
     }
 
 
+    private void loginWithGoogle() {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+
+
+    private void handleSignInResult(Task<GoogleSignInAccount> task) {
+
+        try {
+            GoogleSignInAccount account = task.getResult(ApiException.class);
+
+            Toast.makeText(getContext(), "success", Toast.LENGTH_SHORT).show();
+            firebaseGoogleAuth(account);
+        } catch (ApiException e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            //firebaseGoogleAuth(null);
+        }
+    }
+
+    private void firebaseGoogleAuth(GoogleSignInAccount account) {
+
+        AuthCredential authCredential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        auth.signInWithCredential(authCredential).addOnCompleteListener(getActivity() , task -> {
+            if (task.isSuccessful()){
+                Toast.makeText(getContext(), "success", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
+            }
+        });
+    }
 
     @Override
     public void onStart() {
@@ -84,16 +134,26 @@ public class LoginFragment extends Fragment {
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN){
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
 
     private void login() {
         String email = binding.editEmailLogin.getText().toString();
         String password = binding.editPasswordLogin.getText().toString();
 
-        if (!email.isEmpty() && !password.isEmpty()) {
-            FirebaseHelper.getInstance(getContext()).userLogin(email, password, getContext(), view);
-        } else {
-            binding.layoutEmail.setBackgroundResource(R.drawable.background_input_empty);
-            binding.layoutPassword.setBackgroundResource(R.drawable.background_input_empty);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            if (!email.isEmpty() && !password.isEmpty()) {
+                FirebaseHelper.getInstance(getContext()).userLogin(email, password, getContext(), view);
+            } else {
+                binding.layoutEmail.setBackgroundResource(R.drawable.background_input_empty);
+                binding.layoutPassword.setBackgroundResource(R.drawable.background_input_empty);
+            }
         }
 
     }

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "751331957006-3no1ooa269kh22rpt4trsu1uivbj6v2d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "amo.tripplanner",
+            "certificate_hash": "932e8bddba80e1efede2fa7ac3d4303a9a9a4c19"
+          }
+        },
+        {
           "client_id": "751331957006-8tghb8pt09c02biblaaqhg34avg4bk07.apps.googleusercontent.com",
           "client_type": 3
         }

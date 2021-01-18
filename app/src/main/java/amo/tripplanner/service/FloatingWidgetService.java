@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.Layout;
@@ -95,24 +96,8 @@ public class FloatingWidgetService extends Service {
         View expandedView = mFloatingView.findViewById(R.id.expanded_view);
         expandedView.setVisibility(View.GONE);
 
-//        ImageView imageView = mFloatingView.findViewById(R.id.fabHead);
-//        imageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.i("Mohamed", "Mohamed");
-
-//
-//            }
-//        });
 
 
-        /*mFloatingView.setClickable(true);
-        mFloatingView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("Mohamed", "Mohamed");
-            }
-        });*/
         mFloatingView.setOnTouchListener(new View.OnTouchListener() {
             int initialX, initialY;
             float initialTouchX, initialTouchY;
@@ -188,27 +173,7 @@ public class FloatingWidgetService extends Service {
         }
     }
 
-    /*private void getNote(){
-        WindowManager mWindowManager = (WindowManager)getSystemService(WINDOW_SERVICE);
-        WindowManager.LayoutParams listParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT);
-        listParams.gravity = Gravity.CENTER;
-        listParams.x = 100;
-        listParams.y = 100;
-        List<Note> arrayList = new ArrayList<>();
-        arrayList.add(new Note("AS"));
-        arrayList.add(new Note("AS"));
-        arrayList.add(new Note("AS"));
 
-        View view = LayoutInflater.from(FloatingWidgetService.this).inflate(R.layout.fragment_note, null);
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(FloatingWidgetService.this));
-        NoteListAdapter adapter = new NoteListAdapter();
-        adapter.setNotes(arrayList);
-        recyclerView.setAdapter(adapter);
-        mWindowManager.addView(view, listParams);
-        view.setVisibility(View.VISIBLE);
-    }*/
 
 
 }

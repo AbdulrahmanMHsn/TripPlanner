@@ -90,6 +90,22 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
+
+        bindingHome.navView.getMenu().getItem(1).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Navigation.findNavController(getView()).navigate(R.id.action_homeFragment_to_historyFragment);
+                return false;
+            }
+        });
+
+        bindingHome.navView.getMenu().getItem(0).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                drawerLayout.close();
+                return false;
+            }
+        });
         bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

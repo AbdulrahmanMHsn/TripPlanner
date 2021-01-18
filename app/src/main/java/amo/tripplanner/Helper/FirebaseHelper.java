@@ -9,6 +9,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -89,7 +92,7 @@ public class FirebaseHelper {
     }
 
 
-    public static void signUp(final String email, final String password, final Context context, final View view, final int id) {
+    public void signUp(final String email, final String password, final Context context, final View view, final int id) {
 
         final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.createUserWithEmailAndPassword(email, password).
@@ -150,5 +153,8 @@ public class FirebaseHelper {
     public String getCurrentUserEmail() {
         return Objects.requireNonNull(mAuth.getCurrentUser()).getEmail();
     }
+
+
+
 }
 
