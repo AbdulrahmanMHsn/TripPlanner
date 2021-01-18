@@ -117,6 +117,12 @@ public class FirebaseHelper {
                 });
     }
 
+    public void logOut(){
+        final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth.signOut();
+
+    }
+
 
     public void syncWithBackend(List<Trip> trips) {
 

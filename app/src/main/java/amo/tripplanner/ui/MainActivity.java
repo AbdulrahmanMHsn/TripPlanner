@@ -2,13 +2,19 @@ package amo.tripplanner.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.ActivityMainBinding;
 
@@ -17,17 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-//
-//    private static final int POS_DASHBOARD = 0;
-//    private static final int POS_ACCOUNT = 1;
-//    private static final int POS_MESSAGES = 2;
-//    private static final int POS_CART = 3;
-//    private static final int POS_LOGOUT = 5;
-//
-//    private String[] screenTitles;
-//    private Drawable[] screenIcons;
-//
-//    private SlidingRootNav slidingRootNav;
+    DrawerLayout drawerLayout;
+    NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,17 +32,21 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG, "onCreate: started.");
         
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        navController = Navigation.findNavController(this, R.id.myNavHostFragment);
+        drawerLayout = binding.drawerLayout;
+
+        binding.drawerToolbar.toolbarNavDrawer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.open();
+            }
+        });
+
+
+
+
     }
 
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if(keyCode==KeyEvent.KEYCODE_BACK)
-//        {
-//            return true;
-//        }
-//
-//        return false;
-//        // Disable back button..............
-//    }
+
 
 }

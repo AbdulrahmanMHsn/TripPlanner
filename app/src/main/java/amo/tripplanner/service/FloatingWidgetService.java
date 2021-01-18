@@ -92,6 +92,8 @@ public class FloatingWidgetService extends Service {
         height = windowManager.getDefaultDisplay().getHeight();
         width = windowManager.getDefaultDisplay().getWidth();
 
+        View expandedView = mFloatingView.findViewById(R.id.expanded_view);
+        expandedView.setVisibility(View.GONE);
 
 //        ImageView imageView = mFloatingView.findViewById(R.id.fabHead);
 //        imageView.setOnClickListener(new View.OnClickListener() {
@@ -140,7 +142,12 @@ public class FloatingWidgetService extends Service {
                         layoutParam.y = initialY + (int) (event.getRawY() - initialTouchY);
 
                         if (clickDuration < maxClickDuration) {
-                            getNote();
+                            if (expandedView.getVisibility() == View.GONE){
+                                expandedView.setVisibility(View.VISIBLE);
+                            }
+                            else if (expandedView.getVisibility() == View.VISIBLE){
+                                expandedView.setVisibility(View.GONE);
+                            }
                         } else {
                             if (layoutParam.y > (height * 0.6)) {
                                 stopSelf();
@@ -181,7 +188,7 @@ public class FloatingWidgetService extends Service {
         }
     }
 
-    private void getNote(){
+    /*private void getNote(){
         WindowManager mWindowManager = (WindowManager)getSystemService(WINDOW_SERVICE);
         WindowManager.LayoutParams listParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
@@ -201,7 +208,7 @@ public class FloatingWidgetService extends Service {
         recyclerView.setAdapter(adapter);
         mWindowManager.addView(view, listParams);
         view.setVisibility(View.VISIBLE);
-    }
+    }*/
 
 
 }

@@ -71,6 +71,8 @@ public class HomeFragment extends Fragment {
 
         onBackPressed();
 
+
+
         bindingHome.idRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         adapter = new TripListAdapter();
