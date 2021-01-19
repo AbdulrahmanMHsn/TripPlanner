@@ -58,6 +58,15 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
         Note note = notes.get(position);
         itemBinding.itemNoteTxtVwBody.setText(note.getBody());
 
+
+        holder.itemBinding.layoutItemNote.setOnClickListener(view -> {
+            if (mListener != null) {
+                if (position != RecyclerView.NO_POSITION) {
+                    mListener.onItemDeleteClick(position);
+                }
+            }
+        });
+
 //        itemBinding.itemNoteImgDelete.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -110,6 +119,7 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteVi
                     }
                 }
             });
+
 
             itemBinding.itemNoteChBoxCompleted.setOnClickListener(v -> {
                 if (listener != null) {

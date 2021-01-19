@@ -149,6 +149,15 @@ public class TripRepository {
         });
     }
 
+//    public void delete(final Note note) {
+//        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                tripDao.deleteTrip(note);
+//            }
+//        });
+//    }
+
     public void deleteAll() {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override

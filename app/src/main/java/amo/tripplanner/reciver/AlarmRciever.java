@@ -28,7 +28,8 @@ public class AlarmRciever extends BroadcastReceiver {
         context = context1;
 
         int tripId = intent.getIntExtra("TripID", 0);
-        Log.i("AlarmRciever", "onReceive: tripId : "+tripId);
+        String tripName= intent.getStringExtra("TripName");
+
 
        /* if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             Intent serviceIntent = new Intent(context, MainActivity.class);
@@ -36,10 +37,11 @@ public class AlarmRciever extends BroadcastReceiver {
             context.startService(serviceIntent);
         }*/
 
-        Intent i = new Intent(context, DailogActivity.class);
+        Intent i = new Intent(context1, DailogActivity.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
             i.putExtra("TripID",tripId);
+            i.putExtra("TripName",tripName);
         }
 
         context.startActivity(i);

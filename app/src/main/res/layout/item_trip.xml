@@ -9,7 +9,7 @@
         android:layout_height="150dp"
         android:backgroundTint="@android:color/white"
         android:elevation="8dp"
-        app:cardCornerRadius="20dp"
+        app:cardCornerRadius="8dp"
         android:layout_margin="8dp"
         android:background="@drawable/background">
 
@@ -113,11 +113,13 @@
             android:id="@+id/item_txtVw_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_marginStart="4dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="3dp"
             android:fontFamily="sans-serif-black"
             android:textColor="@android:color/black"
             android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@+id/item_txtVw_startPoint"
             app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Family" />

@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -97,6 +98,7 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
 
         historyBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_history, container, false);
 
+
         historyBinding.idRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         adapter = new TripHistoryListAdapter(getContext());
@@ -109,6 +111,8 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
             adapter.setTrips(tripList);
         });
 
+        deleteItemBySwabbing();
+
         return historyBinding.getRoot();
     }
 
@@ -118,7 +122,7 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
 
         historyBinding.mapView.onCreate(savedInstanceState);
         historyBinding.mapView.getMapAsync(this);
-
+        onBackPressed();
     }
 
     private void deleteItemBySwabbing() {
@@ -140,6 +144,15 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
         itemTouchHelper.attachToRecyclerView(historyBinding.idRecyclerView);
     }
 
+    private void onBackPressed() {
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Navigation.findNavController(requireView()).navigate(R.id.action_historyFragment_to_homeFragment);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);
+    }
 
 
     @Override

@@ -36,7 +36,6 @@ public interface TripDao {
     LiveData<Trip> getTripById(int tripId);
 
 
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertTrip(Trip trip);
 
@@ -61,6 +60,9 @@ public interface TripDao {
 
     @Delete
     void deleteTrip(Trip trip);
+
+//    @Delete
+//    void deleteTrip(Note note);
 
 
     @Query("DELETE FROM trip_table")

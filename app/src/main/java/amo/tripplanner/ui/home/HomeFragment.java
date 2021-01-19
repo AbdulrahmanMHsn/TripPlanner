@@ -200,7 +200,11 @@ public class HomeFragment extends Fragment {
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                requireActivity().finish();
+                if(bindingHome.drawerLayout.isOpen()){
+                    bindingHome.drawerLayout.close();
+                }else {
+                    requireActivity().finish();
+                }
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), callback);

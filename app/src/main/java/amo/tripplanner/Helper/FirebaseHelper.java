@@ -41,6 +41,15 @@ public class FirebaseHelper {
     private DatabaseReference mDatabaseReference;
 
     private String mUID;
+    private String mEmail;
+
+    public String getmEmail() {
+        return mEmail;
+    }
+
+    public void setmEmail(String mEmail) {
+        this.mEmail = mEmail;
+    }
 
     public String getmUID() {
         return mUID;
@@ -82,6 +91,8 @@ public class FirebaseHelper {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            mUID = firebaseAuth.getCurrentUser().getUid();
+                            mEmail = firebaseAuth.getCurrentUser().getEmail();
                             Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
                         } else {
                             Toast.makeText(context, "failed", Toast.LENGTH_SHORT);
@@ -129,7 +140,7 @@ public class FirebaseHelper {
 
     public void syncWithBackend(List<Trip> trips,List<Trip> HistoryTrips) {
 
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("user").child("g5xu0caoaJMDU0Rm8mdkSNNnE2k2").child("trips");
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("user").child(getmUID()).child("trips");
 
         rootRef.setValue(trips).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -143,7 +154,7 @@ public class FirebaseHelper {
         });
 
 
-        DatabaseReference rootRefHistory = FirebaseDatabase.getInstance().getReference("user").child("g5xu0caoaJMDU0Rm8mdkSNNnE2k2").child("history");
+        DatabaseReference rootRefHistory = FirebaseDatabase.getInstance().getReference("user").child(getmUID()).child("history");
 
         rootRefHistory.setValue(HistoryTrips).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

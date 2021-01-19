@@ -64,7 +64,7 @@ public class AddTripFragment extends Fragment {
     //vars
     public static final String TAG = "AddFragment";
     private boolean isStart;
-    private String[] repeats = {"No Repeat", "Repeat Daily", "Repeat Monthly", "Repeat Weekly"};
+    private String[] repeats = {"No Repeat", "Repeat Daily", "Repeat Weekly","Repeat Monthly"};
     Calendar currentCalendar = Calendar.getInstance();
 
     //Alarm
@@ -212,8 +212,8 @@ public class AddTripFragment extends Fragment {
                 Location endLocation = new Location(endAddress, endLatitude, endLongitude);
                 List<Note> list = new ArrayList<>();
                 final int idAlarm = (int) System.currentTimeMillis();
-                turnOnAlarmManager(timestamp,idAlarm);
-                Trip trip = new Trip(idAlarm,tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list);
+                turnOnAlarmManager(timestamp, idAlarm);
+                Trip trip = new Trip(idAlarm, tripName, startLocation, endLocation, timestamp, tripStatus, tripIsRound, tripRepeat, list);
                 insertTrip(trip);
                 Navigation.findNavController(view).popBackStack();
                 Toast.makeText(v.getContext(), "Trip Saved", Toast.LENGTH_SHORT).show();
@@ -276,7 +276,7 @@ public class AddTripFragment extends Fragment {
         // call observe
         TripListViewModel listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
 //         listViewModel.insert(trip);
-          listViewModel.insert(trip);
+        listViewModel.insert(trip);
 //         listViewModel.getId();
     }
 
@@ -288,16 +288,54 @@ public class AddTripFragment extends Fragment {
     private void turnOnAlarmManager(long timestamp, int tripId) {
         Intent intent = new Intent(requireContext(), AlarmRciever.class);
         intent.putExtra("TripID", tripId);
+        intent.putExtra("TripName", tripName);
 
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), tripId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
-        } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
+        if (tripRepeat.equals(repeats[0])) {
+            Toast.makeText(getContext(), "No repeat", Toast.LENGTH_SHORT).show();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
+            }
+        }else{
+
+            if(tripRepeat.equals(repeats[1])) {
+                Toast.makeText(getContext(), "repeat daily", Toast.LENGTH_SHORT).show();
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timestamp, AlarmManager.INTERVAL_DAY, pendingIntent);
+//                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timestamp, AlarmManager.INTERVAL_DAY, pendingIntent);
+//                } else {
+//                    alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timestamp, AlarmManager.INTERVAL_DAY, pendingIntent);
+//                }
+            }else if(tripRepeat.equals(repeats[2])){
+                Toast.makeText(getContext(), "repeat weekly", Toast.LENGTH_SHORT).show();
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timestamp, 7*AlarmManager.INTERVAL_DAY, pendingIntent);
+//                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timestamp, 7*AlarmManager.INTERVAL_DAY, pendingIntent);
+//                } else {
+//                    alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timestamp, 7*AlarmManager.INTERVAL_DAY, pendingIntent);
+//                }
+            }else if(tripRepeat.equals(repeats[3])){
+                Toast.makeText(getContext(), "repeat monthly", Toast.LENGTH_SHORT).show();
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timestamp, 30*AlarmManager.INTERVAL_DAY, pendingIntent);
+//                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timestamp, 30*AlarmManager.INTERVAL_DAY, pendingIntent);
+//                } else {
+//                    alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timestamp, 30*AlarmManager.INTERVAL_DAY, pendingIntent);
+//                }
+            }
+
         }
+
+
+
     }
 
 

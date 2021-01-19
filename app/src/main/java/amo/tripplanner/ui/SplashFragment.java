@@ -55,7 +55,8 @@ public class SplashFragment extends Fragment {
                 @Override
                 public void run() {
                     if (user != null) {
-//                            FirebaseHelper.getInstance(requireContext()).
+                        FirebaseHelper.getInstance(requireContext()).setmUID(auth.getCurrentUser().getUid());
+                        FirebaseHelper.getInstance(requireContext()).setmEmail(auth.getCurrentUser().getEmail());
                         Navigation.findNavController(view).navigate(R.id.action_splashFragment_to_homeFragment);
                     } else {
                         Navigation.findNavController(view).navigate(R.id.action_splashFragment_to_loginFragment);

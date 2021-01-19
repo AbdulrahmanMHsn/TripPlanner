@@ -69,6 +69,7 @@ public class DailogActivity extends AppCompatActivity {
     private Trip trip = new Trip();
     private int tripId;
     private String tripName;
+    private String tripRepeat;
     private List<Note> noteList = new ArrayList<>();
 
     @Override
@@ -77,47 +78,48 @@ public class DailogActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dailog);
 
 
-        int tripId = getIntent().getIntExtra("TripID", 0);
-        Log.i("DailogActivity", "onCreate: TripID: " + tripId);
+        tripId = getIntent().getIntExtra("TripID", 0);
+        tripName = getIntent().getStringExtra("TripName");
 
-        listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
-
-        listViewModels.getTripById(tripId).observe(this, trips -> {
-            trip = trips;
-//            if (!isRestarted) {
-            saveOnSharedPreference();
-//                isRestarted = true;
-//                Log.i("isRestarted", "onCreate: "+isRestarted);
-//            }
-            Log.i("isRestarted", "onCreate: " + isRestarted);
+        if(tripId == 0){
             getDataFromSharedPreference();
-            openDialog(this);
-        });
+        }
 
 
-        TripListViewModel listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
-        listViewModels.getNoteById(tripId).observe(this, trip -> {
-            noteList = trip.getTripNotes();
-            for (Note note : noteList) {
-                Log.i("FloatingWidgetService", "onStartCommand: " + note);
-            }
-        });
+        if(tripId != 0) {
 
+            listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
+
+            listViewModels.getTripById(tripId).observe(this, trips -> {
+                trip = trips;
+                tripRepeat = trip.getTripRepeat();
+                openDialog(this);
+            });
+
+
+            listViewModels.getNoteById(tripId).observe(this, trip -> {
+                noteList = trip.getTripNotes();
+            });
+            saveOnSharedPreference();
+        }
 
     }
 
+
     private void saveOnSharedPreference() {
-        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("TripId", trip.getTripId());
-        editor.putString("TripName", trip.getTripName());
-        editor.commit();
+            SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt("TripId", tripId);
+            editor.putString("TripName", tripName);
+            editor.putString("TripRepeat", tripRepeat);
+            editor.commit();
     }
 
     private void getDataFromSharedPreference() {
         SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
         tripId = preferences.getInt("TripId", 0);
         tripName = preferences.getString("TripName", "TripName");
+        tripRepeat = preferences.getString("TripRepeat", "TripRepeat");
     }
 
     @SuppressLint("ObsoleteSdkInt")
@@ -130,8 +132,10 @@ public class DailogActivity extends AppCompatActivity {
         builder1.setPositiveButton("START", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                TripListViewModel listViewModels = ViewModelProviders.of(DailogActivity.this).get(TripListViewModel.class);
-                listViewModels.update(tripId, "Done");
+                if(tripRepeat.equals("No Repeat")) {
+                    TripListViewModel listViewModels = ViewModelProviders.of(DailogActivity.this).get(TripListViewModel.class);
+                    listViewModels.update(tripId, "Done");
+                }
 
                 double latitude1 = trip.getTripStartLocation().getLatitude();
                 double longitude1 = trip.getTripStartLocation().getLongitude();
@@ -151,8 +155,10 @@ public class DailogActivity extends AppCompatActivity {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                TripListViewModel listViewModels = ViewModelProviders.of(DailogActivity.this).get(TripListViewModel.class);
-                listViewModels.update(tripId, "Cancel");
+                if(tripRepeat.equals("No Repeat")) {
+                    TripListViewModel listViewModels = ViewModelProviders.of(DailogActivity.this).get(TripListViewModel.class);
+                    listViewModels.update(tripId, "Cancel");
+                }
                 dialog.cancel();
             }
         });
@@ -163,7 +169,7 @@ public class DailogActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 NotificationHelper notificationHelper = new NotificationHelper(context);
                 NotificationCompat.Builder nb = notificationHelper.getChannelNotification(tripName);
-                notificationHelper.getManager().notify(1, nb.build());
+                notificationHelper.getManager().notify(tripId, nb.build());
             }
         });
 
@@ -182,9 +188,6 @@ public class DailogActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-//        isRestarted = true;
-    }
+
+
 }
