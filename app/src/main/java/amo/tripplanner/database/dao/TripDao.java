@@ -24,19 +24,25 @@ public interface TripDao {
     LiveData<List<Trip>> getAllTrips();
 
 
+    @Query("SELECT * FROM trip_table WHERE trip_status != 'Upcoming'")
+    LiveData<List<Trip>> getAllHistory();
+
+
     @Query("SELECT * FROM trip_table WHERE trip_id = :tripId")
     LiveData<Trip> getAllNotesById(int tripId);
+
 
     @Query("SELECT * FROM trip_table WHERE trip_id = :tripId")
     LiveData<Trip> getTripById(int tripId);
 
 
 
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    void insertTrip(Trip trip);
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertTrip(Trip trip);
+
+
+    @Query("UPDATE trip_table SET trip_status =:status WHERE trip_id = :id")
+    void updateTrip(int id, String status);
 
 
     @Update(onConflict = OnConflictStrategy.REPLACE)

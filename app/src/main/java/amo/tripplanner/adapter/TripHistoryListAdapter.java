@@ -13,11 +13,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
-
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -26,14 +23,12 @@ import java.util.List;
 
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.ItemTripBinding;
+import amo.tripplanner.databinding.ItemTripHistoryBinding;
 import amo.tripplanner.pojo.Trip;
 import amo.tripplanner.service.FloatingWidgetService;
-import amo.tripplanner.ui.DailogActivity;
-import amo.tripplanner.ui.MainActivity;
 import amo.tripplanner.ui.home.HomeFragmentDirections;
-import amo.tripplanner.viewmodel.TripListViewModel;
 
-public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripViewHolder> {
+public class TripHistoryListAdapter extends RecyclerView.Adapter<TripHistoryListAdapter.TripViewHolder> {
 
     Context context;
     private static final String TAG = "TripListAdapter";
@@ -50,7 +45,7 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
         mListener = listener;
     }
 
-    public TripListAdapter(Context context) {
+    public TripHistoryListAdapter(Context context) {
         this.context = context;
     }
 
@@ -58,7 +53,7 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
     @Override
     public TripViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         view = parent;
-        ItemTripBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_trip, parent, false);
+        ItemTripHistoryBinding itemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_trip_history, parent, false);
 
         return new TripViewHolder(itemBinding);
     }
@@ -89,17 +84,17 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
         holder.itemBinding.itemTxtVwDate.setText(dateTxt);
 
 
-        holder.itemBinding.itemTxtVwTripMenu.setOnClickListener(v -> {
-            HomeFragmentDirections.ActionHomeFragmentToEditTripFragment action = HomeFragmentDirections.actionHomeFragmentToEditTripFragment();
-            action.setId(item.getTripId());
-            action.setName(item.getTripName());
-            action.setStartPoint(item.getTripStartLocation().getAddress());
-            action.setEndPoint(item.getTripEndLocation().getAddress());
-            action.setTimestamp(item.getTripTimestamp());
-            action.setIsRounded(item.isTripIsRound());
-            action.setRepeat(item.getTripRepeat());
-            Navigation.findNavController(view).navigate(action);
-        });
+//        holder.itemBinding.itemTxtVwTripMenu.setOnClickListener(v -> {
+//            HomeFragmentDirections.ActionHomeFragmentToEditTripFragment action = HomeFragmentDirections.actionHomeFragmentToEditTripFragment();
+//            action.setId(item.getTripId());
+//            action.setName(item.getTripName());
+//            action.setStartPoint(item.getTripStartLocation().getAddress());
+//            action.setEndPoint(item.getTripEndLocation().getAddress());
+//            action.setTimestamp(item.getTripTimestamp());
+//            action.setIsRounded(item.isTripIsRound());
+//            action.setRepeat(item.getTripRepeat());
+//            Navigation.findNavController(view).navigate(action);
+//        });
 
 
         holder.itemBinding.ItemLinearLayout.setOnClickListener(view -> {
@@ -111,32 +106,29 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
         });
 
 
-        holder.itemBinding.itemBtnStartTrip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                double latitude1 = item.getTripStartLocation().getLatitude();
-                double longitude1 = item.getTripStartLocation().getLongitude();
-                double latitude2 = item.getTripEndLocation().getLatitude();
-                double longitude2 = item.getTripEndLocation().getLongitude();
-
-                TripListViewModel listViewModels = ViewModelProviders.of((FragmentActivity) context).get(TripListViewModel.class);
-                listViewModels.update(item.getTripId(),"Done");
-
-                String uri = "http://maps.google.com/maps?f=d&hl=en&saddr="+latitude1+","+longitude1+"&daddr="+latitude2+","+longitude2;
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
-                context.startActivity(Intent.createChooser(intent, "Select an application"));
-                Intent intent1 = new Intent(v.getContext(), FloatingWidgetService.class);
-                intent1.putExtra("ListNotes", (Serializable) item.getTripNotes());
-                v.getContext().startService(intent1);
-            }
-        });
+//        holder.itemBinding.itemBtnStartTrip.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                double latitude1 = item.getTripStartLocation().getLatitude();
+//                double longitude1 = item.getTripStartLocation().getLongitude();
+//                double latitude2 = item.getTripEndLocation().getLatitude();
+//                double longitude2 = item.getTripEndLocation().getLongitude();
+//
+//                String uri = "http://maps.google.com/maps?f=d&hl=en&saddr="+latitude1+","+longitude1+"&daddr="+latitude2+","+longitude2;
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+//                context.startActivity(Intent.createChooser(intent, "Select an application"));
+//                Intent intent1 = new Intent(v.getContext(), FloatingWidgetService.class);
+//                intent1.putExtra("ListNotes", (Serializable) item.getTripNotes());
+//                v.getContext().startService(intent1);
+//            }
+//        });
 
 
-        holder.itemBinding.itemImgTripNote.setOnClickListener(v -> {
-            HomeFragmentDirections.ActionHomeFragmentToNoteFragment action = HomeFragmentDirections.actionHomeFragmentToNoteFragment();
-            action.setId(item.getTripId());
-            Navigation.findNavController(view).navigate(action);
-        });
+//        holder.itemBinding.itemImgTripNote.setOnClickListener(v -> {
+//            HomeFragmentDirections.ActionHomeFragmentToNoteFragment action = HomeFragmentDirections.actionHomeFragmentToNoteFragment();
+//            action.setId(item.getTripId());
+//            Navigation.findNavController(view).navigate(action);
+//        });
 
     }
 
@@ -204,9 +196,9 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
     }
 
     static class TripViewHolder extends RecyclerView.ViewHolder {
-        ItemTripBinding itemBinding;
+        ItemTripHistoryBinding itemBinding;
 
-        public TripViewHolder(@NonNull ItemTripBinding itemBinding) {
+        public TripViewHolder(@NonNull ItemTripHistoryBinding itemBinding) {
             super(itemBinding.getRoot());
             this.itemBinding = itemBinding;
         }

@@ -30,11 +30,13 @@ public class TripRepository {
     }
 
     private LiveData<List<Trip>> listTrips;
+    private LiveData<List<Trip>> listHistoryTrips;
 
     private TripRepository(Application application) {
         AppDatabase database = AppDatabase.getInstance(application);
         tripDao = database.tripDao();
         listTrips = tripDao.getAllTrips();
+        listHistoryTrips = tripDao.getAllHistory();
     }
 
     public static TripRepository getInstance(Application application) {
@@ -51,6 +53,10 @@ public class TripRepository {
 
     public LiveData<List<Trip>> getAllTrips() {
         return listTrips;
+    }
+
+    public LiveData<List<Trip>> getAllHistoryTrips() {
+        return listHistoryTrips;
     }
 
 
@@ -92,6 +98,16 @@ public class TripRepository {
             }
         });
     }
+
+    public void update(final int id,String status) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                tripDao.updateTrip(id,status);
+            }
+        });
+    }
+
 
 
     public void update(final int id, final List<Note> notes) {

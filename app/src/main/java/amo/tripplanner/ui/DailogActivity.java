@@ -84,30 +84,24 @@ public class DailogActivity extends AppCompatActivity {
 
         listViewModels.getTripById(tripId).observe(this, trips -> {
             trip = trips;
-            if (!isRestarted) {
-                saveOnSharedPreference();
-                isRestarted = true;
-                Log.i("isRestarted", "onCreate: "+isRestarted);
-            }
-            Log.i("isRestarted", "onCreate: "+isRestarted);
+//            if (!isRestarted) {
+            saveOnSharedPreference();
+//                isRestarted = true;
+//                Log.i("isRestarted", "onCreate: "+isRestarted);
+//            }
+            Log.i("isRestarted", "onCreate: " + isRestarted);
             getDataFromSharedPreference();
             openDialog(this);
         });
 
 
-
-
-
         TripListViewModel listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
         listViewModels.getNoteById(tripId).observe(this, trip -> {
             noteList = trip.getTripNotes();
-            for(Note note:noteList){
-                Log.i("FloatingWidgetService", "onStartCommand: "+note);
+            for (Note note : noteList) {
+                Log.i("FloatingWidgetService", "onStartCommand: " + note);
             }
         });
-
-
-
 
 
     }
@@ -136,13 +130,15 @@ public class DailogActivity extends AppCompatActivity {
         builder1.setPositiveButton("START", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                TripListViewModel listViewModels = ViewModelProviders.of(DailogActivity.this).get(TripListViewModel.class);
+                listViewModels.update(tripId, "Done");
 
                 double latitude1 = trip.getTripStartLocation().getLatitude();
                 double longitude1 = trip.getTripStartLocation().getLongitude();
                 double latitude2 = trip.getTripEndLocation().getLatitude();
                 double longitude2 = trip.getTripEndLocation().getLongitude();
 
-                String uri = "http://maps.google.com/maps?f=d&hl=en&saddr="+latitude1+","+longitude1+"&daddr="+latitude2+","+longitude2;
+                String uri = "http://maps.google.com/maps?f=d&hl=en&saddr=" + latitude1 + "," + longitude1 + "&daddr=" + latitude2 + "," + longitude2;
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
                 context.startActivity(Intent.createChooser(intent, "Select an application"));
                 Intent intent1 = new Intent(getBaseContext(), FloatingWidgetService.class);
@@ -155,9 +151,12 @@ public class DailogActivity extends AppCompatActivity {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                TripListViewModel listViewModels = ViewModelProviders.of(DailogActivity.this).get(TripListViewModel.class);
+                listViewModels.update(tripId, "Cancel");
                 dialog.cancel();
             }
         });
+
 
         builder1.setNeutralButton("SNOOZE", new DialogInterface.OnClickListener() {
             @Override
@@ -186,6 +185,6 @@ public class DailogActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        isRestarted = true;
+//        isRestarted = true;
     }
 }

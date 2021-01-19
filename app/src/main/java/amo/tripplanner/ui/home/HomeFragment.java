@@ -44,7 +44,6 @@ import timber.log.Timber;
 
 import static android.content.Context.ALARM_SERVICE;
 
-
 public class HomeFragment extends Fragment {
 
     DrawerLayout drawerLayout;
@@ -58,6 +57,7 @@ public class HomeFragment extends Fragment {
     private TripListViewModel listViewModel;
 
     private List<Trip> tripList = new ArrayList<>();
+    private List<Trip> tripListHistory = new ArrayList<>();
 
     public HomeFragment() {
         // Required empty public constructor
@@ -99,6 +99,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
+
         bindingHome.navView.getMenu().getItem(0).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -106,6 +108,8 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
+
+
         bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +126,12 @@ public class HomeFragment extends Fragment {
         listViewModel.getAllTrips().observe(getViewLifecycleOwner(), trips -> {
             tripList = trips;
             adapter.setTrips(tripList);
+        });
+
+        listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
+        listViewModel.getAllHistoryTrips().observe(getViewLifecycleOwner(), trips -> {
+            tripListHistory = trips;
+//            adapter.setTrips(tripList);
         });
 
         deleteItemBySwabbing();
@@ -147,6 +157,16 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        bindingHome.navView.getMenu().getItem(2).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                FirebaseHelper.getInstance(getContext()).syncWithBackend(tripList,tripListHistory);
+//                FirebaseHelper.getInstance(getContext()).syncWithBackend(tripListHistory);
+                return false;
+            }
+        });
 
 
        /* bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(v -> {

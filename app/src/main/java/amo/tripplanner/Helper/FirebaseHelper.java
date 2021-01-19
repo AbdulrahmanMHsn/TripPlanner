@@ -127,11 +127,25 @@ public class FirebaseHelper {
     }
 
 
-    public void syncWithBackend(List<Trip> trips) {
+    public void syncWithBackend(List<Trip> trips,List<Trip> HistoryTrips) {
 
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("user").child("g5xu0caoaJMDU0Rm8mdkSNNnE2k2").child("trips");
 
         rootRef.setValue(trips).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if (!task.isSuccessful()) {
+                    Log.i(TAG, "onComplete: failed");
+                }
+
+            }
+        });
+
+
+        DatabaseReference rootRefHistory = FirebaseDatabase.getInstance().getReference("user").child("g5xu0caoaJMDU0Rm8mdkSNNnE2k2").child("history");
+
+        rootRefHistory.setValue(HistoryTrips).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 

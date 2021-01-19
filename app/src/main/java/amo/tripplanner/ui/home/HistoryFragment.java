@@ -47,6 +47,7 @@ import java.util.List;
 
 import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
+import amo.tripplanner.adapter.TripHistoryListAdapter;
 import amo.tripplanner.adapter.TripListAdapter;
 import amo.tripplanner.databinding.FragmentHistoryBinding;
 import amo.tripplanner.databinding.FragmentHomeBinding;
@@ -68,9 +69,7 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
     private static final String TAG = "HistoryFragment";
 
     private FragmentHistoryBinding historyBinding;
-
-    private TripListAdapter adapter;
-
+    private TripHistoryListAdapter adapter;
     private TripListViewModel listViewModel;
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -78,10 +77,8 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
     private LocationComponent locationComponent;
     private DirectionsRoute currentRoute;
     private NavigationMapRoute navigationMapRoute;
-
-
-
     private List<Trip> tripList = new ArrayList<>();
+
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -100,15 +97,14 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
 
         historyBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_history, container, false);
 
-//        onBackPressed();
-
         historyBinding.idRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        adapter = new TripListAdapter(getContext());
+        adapter = new TripHistoryListAdapter(getContext());
+
         historyBinding.idRecyclerView.setAdapter(adapter);
 
         listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
-        listViewModel.getAllTrips().observe(getViewLifecycleOwner(), trips -> {
+        listViewModel.getAllHistoryTrips().observe(getViewLifecycleOwner(), trips -> {
             tripList = trips;
             adapter.setTrips(tripList);
         });
@@ -137,8 +133,8 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                final Trip subject = adapter.getItem(position);
-                listViewModel.delete(subject);
+                final Trip trip = adapter.getItem(position);
+                listViewModel.delete(trip);
             }
         });
         itemTouchHelper.attachToRecyclerView(historyBinding.idRecyclerView);
@@ -158,7 +154,7 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
             source.setGeoJson(Feature.fromGeometry(destinationPoint));
         }
 
-        getRoute(originPoint, destinationPoint);
+//        getRoute(originPoint, destinationPoint);
 //        button.setEnabled(true);
 //        button.setBackgroundResource(R.color.mapboxBlue);
         return true;
