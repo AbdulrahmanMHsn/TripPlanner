@@ -122,6 +122,17 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
 
         historyBinding.mapView.onCreate(savedInstanceState);
         historyBinding.mapView.getMapAsync(this);
+
+
+
+        historyBinding.toolbar.toolbarNavDrawer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Navigation.findNavController(v).popBackStack();
+            }
+        });
+
+
         onBackPressed();
     }
 
@@ -158,20 +169,24 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
 
-        Point destinationPoint = Point.fromLngLat(tripList.get(0).getTripStartLocation().getLatitude(), tripList.get(0).getTripStartLocation().getLongitude());
-        Point originPoint = Point.fromLngLat(tripList.get(0).getTripEndLocation().getLatitude(),
-                tripList.get(0).getTripEndLocation().getLatitude());
+//        for (Trip trip : tripList) {
+//            Log.i(TAG, "onMapClick: sadsa");
+//            Point destinationPoint = Point.fromLngLat(trip.getTripStartLocation().getLatitude(), trip.getTripStartLocation().getLongitude());
+//            Point originPoint = Point.fromLngLat(trip.getTripEndLocation().getLatitude(),
+//                    trip.getTripEndLocation().getLatitude());
+//
+//            GeoJsonSource source = mapboxMap.getStyle().getSourceAs("destination-source-id");
+//            if (source != null) {
+//                source.s22etGeoJson(Feature.fromGeometry(destinationPoint));
+//            }
+//
+//            getRoute(originPoint, destinationPoint);
+//        }
 
-        GeoJsonSource source = mapboxMap.getStyle().getSourceAs("destination-source-id");
-        if (source != null) {
-            source.setGeoJson(Feature.fromGeometry(destinationPoint));
-        }
-
-//        getRoute(originPoint, destinationPoint);
-//        button.setEnabled(true);
-//        button.setBackgroundResource(R.color.mapboxBlue);
         return true;
     }
+
+
 
     private void getRoute(Point origin, Point destination) {
         assert Mapbox.getAccessToken() != null;
@@ -201,6 +216,7 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
                         } else {
                             navigationMapRoute = new NavigationMapRoute(null, historyBinding.mapView, mapboxMap, R.style.NavigationMapRoute);
                         }
+
                         navigationMapRoute.addRoute(currentRoute);
                     }
 
@@ -229,9 +245,26 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
 
             }
         });
+
+        for (Trip trip : tripList) {
+            Log.i(TAG, "onMapClick: sadsa"+trip.getTripStartLocation().getLatitude());
+            Log.i(TAG, "onMapClick: sadsa"+trip.getTripStartLocation().getLongitude());
+            Log.i(TAG, "onMapClick: sadsa"+trip.getTripEndLocation().getLongitude());
+            Log.i(TAG, "onMapClick: sadsa"+trip.getTripEndLocation().getLatitude());
+            Point originPoint = Point.fromLngLat(trip.getTripStartLocation().getLatitude(), trip.getTripStartLocation().getLongitude());
+            Point destinationPoint = Point.fromLngLat(trip.getTripEndLocation().getLatitude(),
+                    trip.getTripEndLocation().getLongitude());
+
+//            GeoJsonSource source = mapboxMap.getStyle().getSourceAs("destination-source-id");
+//            if (source != null) {
+//                source.setGeoJson(Feature.fromGeometry(originPoint));
+//            }
+
+            getRoute(originPoint, destinationPoint);
+        }
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
 // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(requireContext())) {

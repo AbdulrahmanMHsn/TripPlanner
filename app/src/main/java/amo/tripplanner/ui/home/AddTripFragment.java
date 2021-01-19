@@ -477,13 +477,16 @@ public class AddTripFragment extends Fragment {
                 startAddress = address;
                 startLatitude = latLng.getLatitude();
                 startLongitude = latLng.getLongitude();
+                Log.i(TAG, "onActivityResult: start"+startLatitude+" "+startLongitude);
                 binding.addTripEdTxtVwTripStartPoint.setText(startAddress);
                 isStart = false;
             } else {
+
                 endAddress = address;
                 endLatitude = latLng.getLatitude();
                 endLongitude = latLng.getLongitude();
                 binding.addTripEdTxtVwTripEndPoint.setText(endAddress);
+                Log.i(TAG, "onActivityResult: end"+endLatitude+" "+endLongitude);
             }
         }
     }

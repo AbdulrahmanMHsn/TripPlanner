@@ -30,6 +30,8 @@
         android:id="@+id/splashFragment"
         android:name="amo.tripplanner.ui.SplashFragment"
         android:label="fragment_splash"
+        app:enterAnim="@anim/bottom_to_top"
+        app:exitAnim="@anim/fall_down"
         tools:layout="@layout/fragment_splash" >
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"

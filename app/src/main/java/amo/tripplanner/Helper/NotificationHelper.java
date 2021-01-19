@@ -54,7 +54,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setContentIntent(pendingIntent)
                 .setPriority(Notification.PRIORITY_MAX)
                 .setDefaults(Notification.DEFAULT_ALL)
-                .setSmallIcon(R.drawable.index);
+                .setSmallIcon(R.mipmap.logo_round);
     }
 
 }

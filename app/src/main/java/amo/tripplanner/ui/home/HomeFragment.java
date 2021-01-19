@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -82,11 +83,15 @@ public class HomeFragment extends Fragment {
 
         drawerLayout = bindingHome.drawerLayout;
 
+        View viewHeader = bindingHome.navView.getHeaderView(0);
+        TextView textView = viewHeader.findViewById(R.id.textView5);
+        textView.setText(FirebaseHelper.getInstance(getContext()).getmEmail());
         bindingHome.navView.getMenu().getItem(4).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 FirebaseHelper.getInstance(getContext()).logOut();
                 Navigation.findNavController(getView()).navigate(R.id.action_homeFragment_to_loginFragment);
+                drawerLayout.close();
                 return false;
             }
         });
@@ -95,6 +100,7 @@ public class HomeFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Navigation.findNavController(getView()).navigate(R.id.action_homeFragment_to_historyFragment);
+                drawerLayout.close();
                 return false;
             }
         });
@@ -108,6 +114,7 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
+
 
 
         bindingHome.toolbar.toolbarNavDrawer.setOnClickListener(new View.OnClickListener() {

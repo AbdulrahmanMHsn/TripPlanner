@@ -11,6 +11,7 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -81,46 +82,46 @@ public class DailogActivity extends AppCompatActivity {
         tripId = getIntent().getIntExtra("TripID", 0);
         tripName = getIntent().getStringExtra("TripName");
 
-        if(tripId == 0){
-            getDataFromSharedPreference();
+        if (tripId == 0) {
+//            getDataFromSharedPreference();
         }
 
 
-        if(tripId != 0) {
+        if (tripId != 0) {
 
             listViewModels = ViewModelProviders.of(this).get(TripListViewModel.class);
 
             listViewModels.getTripById(tripId).observe(this, trips -> {
                 trip = trips;
-                tripRepeat = trip.getTripRepeat();
-                openDialog(this);
-            });
+//                tripRepeat = trip.getTripRepeat();
 
+            });
+            openDialog(getApplicationContext());
 
             listViewModels.getNoteById(tripId).observe(this, trip -> {
                 noteList = trip.getTripNotes();
             });
-            saveOnSharedPreference();
+//            saveOnSharedPreference();
+
         }
 
     }
 
-
-    private void saveOnSharedPreference() {
-            SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("TripId", tripId);
-            editor.putString("TripName", tripName);
-            editor.putString("TripRepeat", tripRepeat);
-            editor.commit();
-    }
-
-    private void getDataFromSharedPreference() {
-        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
-        tripId = preferences.getInt("TripId", 0);
-        tripName = preferences.getString("TripName", "TripName");
-        tripRepeat = preferences.getString("TripRepeat", "TripRepeat");
-    }
+//    private void saveOnSharedPreference() {
+//        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.putInt("TripId", tripId);
+//        editor.putString("TripName", tripName);
+////        editor.putString("TripRepeat", tripRepeat);
+//        editor.commit();
+//    }
+//
+//    private void getDataFromSharedPreference() {
+//        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
+//        tripId = preferences.getInt("TripId", 0);
+//        tripName = preferences.getString("TripName", "TripName");
+////        tripRepeat = preferences.getString("TripRepeat", "TripRepeat");
+//    }
 
     @SuppressLint("ObsoleteSdkInt")
     public void openDialog(Context context) {
@@ -132,10 +133,12 @@ public class DailogActivity extends AppCompatActivity {
         builder1.setPositiveButton("START", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(tripRepeat.equals("No Repeat")) {
-                    TripListViewModel listViewModels = ViewModelProviders.of(DailogActivity.this).get(TripListViewModel.class);
-                    listViewModels.update(tripId, "Done");
-                }
+//                if (tripRepeat.equals("No Repeat")) {
+                listViewModels.update(tripId, "Done");
+//                }
+                NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(tripId);
+
 
                 double latitude1 = trip.getTripStartLocation().getLatitude();
                 double longitude1 = trip.getTripStartLocation().getLongitude();
@@ -144,7 +147,7 @@ public class DailogActivity extends AppCompatActivity {
 
                 String uri = "http://maps.google.com/maps?f=d&hl=en&saddr=" + latitude1 + "," + longitude1 + "&daddr=" + latitude2 + "," + longitude2;
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
-                context.startActivity(Intent.createChooser(intent, "Select an application"));
+                startActivity(Intent.createChooser(intent, "Select an application"));
                 Intent intent1 = new Intent(getBaseContext(), FloatingWidgetService.class);
                 intent1.putExtra("ListNotes", (Serializable) noteList);
                 startService(intent1);
@@ -155,10 +158,11 @@ public class DailogActivity extends AppCompatActivity {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(tripRepeat.equals("No Repeat")) {
-                    TripListViewModel listViewModels = ViewModelProviders.of(DailogActivity.this).get(TripListViewModel.class);
-                    listViewModels.update(tripId, "Cancel");
-                }
+//                if (tripRepeat.equals("No Repeat")) {
+                listViewModels.update(tripId, "Cancel");
+                NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(tripId);
+//                }
                 dialog.cancel();
             }
         });
@@ -185,9 +189,6 @@ public class DailogActivity extends AppCompatActivity {
             Objects.requireNonNull(dialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             dialog.show();
         }
-
     }
-
-
 
 }

@@ -118,6 +118,10 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListAdapter.TripVi
                 double longitude1 = item.getTripStartLocation().getLongitude();
                 double latitude2 = item.getTripEndLocation().getLatitude();
                 double longitude2 = item.getTripEndLocation().getLongitude();
+                Log.i(TAG, "onClick: latitude1 : "+latitude1);
+                Log.i(TAG, "onClick: longitude1 : "+longitude1);
+                Log.i(TAG, "onClick: latitude2 : "+latitude2);
+                Log.i(TAG, "onClick: longitude2 : "+longitude2);
 
                 TripListViewModel listViewModels = ViewModelProviders.of((FragmentActivity) context).get(TripListViewModel.class);
                 listViewModels.update(item.getTripId(),"Done");

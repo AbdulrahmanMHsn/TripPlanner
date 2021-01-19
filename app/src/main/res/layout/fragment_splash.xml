@@ -1,8 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/splash"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relMain"
+    android:background="@color/blue"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.SplashFragment"
-    android:background="@drawable/splash_screen"/>
+    android:visibility="gone"
+    android:layout_height="match_parent">
+
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/logo"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:src="@mipmap/logo_round"/>
+
+<!--    <com.airbnb.lottie.LottieAnimationView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:lottie_autoPlay="true"-->
+<!--        app:lottie_loop="true"-->
+<!--        app:lottie_rawRes="@raw/splash"/>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/id_yall_tv"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="YALLA"-->
+<!--        android:fontFamily="cursive"-->
+<!--        android:textSize="50sp"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_marginTop="50dp"-->
+<!--        android:textColor="@color/blue"/>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/id_go_tv"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="GO...."-->
+<!--        android:textSize="30sp"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:fontFamily="sans-serif-condensed-medium"-->
+<!--        android:layout_marginTop="100dp"-->
+<!--        android:gravity="center"-->
+<!--        android:layout_marginRight="30dp"-->
+<!--        android:layout_alignStart="@+id/id_yall_tv"-->
+<!--        android:textColor="@color/blue"/>-->
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="The main duty of yalla go is to planned trips with the start and end point Geo-points "-->
+<!--        android:textSize="20sp"-->
+<!--        android:textColor="@color/blue"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:gravity="center"-->
+<!--        android:layout_marginBottom="40dp"-->
+<!--        />-->
+
+
+
+
+</RelativeLayout>
