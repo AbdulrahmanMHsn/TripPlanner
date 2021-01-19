@@ -46,6 +46,7 @@ public class NotificationHelper extends ContextWrapper {
 
     public NotificationCompat.Builder getChannelNotification(String msg) {
         Intent mainIntent = new Intent(context, DailogActivity.class);
+//        mainIntent.putExtra("idNotification",idNotification);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
                 .setContentTitle(msg)

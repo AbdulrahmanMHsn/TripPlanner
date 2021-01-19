@@ -83,7 +83,7 @@ public class DailogActivity extends AppCompatActivity {
         tripName = getIntent().getStringExtra("TripName");
 
         if (tripId == 0) {
-//            getDataFromSharedPreference();
+            getDataFromSharedPreference();
         }
 
 
@@ -101,27 +101,27 @@ public class DailogActivity extends AppCompatActivity {
             listViewModels.getNoteById(tripId).observe(this, trip -> {
                 noteList = trip.getTripNotes();
             });
-//            saveOnSharedPreference();
+            saveOnSharedPreference();
 
         }
 
     }
 
-//    private void saveOnSharedPreference() {
-//        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.putInt("TripId", tripId);
-//        editor.putString("TripName", tripName);
-////        editor.putString("TripRepeat", tripRepeat);
-//        editor.commit();
-//    }
-//
-//    private void getDataFromSharedPreference() {
-//        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
-//        tripId = preferences.getInt("TripId", 0);
-//        tripName = preferences.getString("TripName", "TripName");
-////        tripRepeat = preferences.getString("TripRepeat", "TripRepeat");
-//    }
+    private void saveOnSharedPreference() {
+        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("TripId", tripId);
+        editor.putString("TripName", tripName);
+//        editor.putString("TripRepeat", tripRepeat);
+        editor.commit();
+    }
+
+    private void getDataFromSharedPreference() {
+        SharedPreferences preferences = getSharedPreferences("Trip", MODE_PRIVATE);
+        tripId = preferences.getInt("TripId", 0);
+        tripName = preferences.getString("TripName", "TripName");
+//        tripRepeat = preferences.getString("TripRepeat", "TripRepeat");
+    }
 
     @SuppressLint("ObsoleteSdkInt")
     public void openDialog(Context context) {
