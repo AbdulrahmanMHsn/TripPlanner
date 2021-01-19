@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.Layout;
@@ -130,14 +131,6 @@ public class FloatingWidgetService extends Service {
 //            }
 //        });
 
-
-        /*mFloatingView.setClickable(true);
-        mFloatingView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("Mohamed", "Mohamed");
-            }
-        });*/
         mFloatingView.setOnTouchListener(new View.OnTouchListener() {
             int initialX, initialY;
             float initialTouchX, initialTouchY;

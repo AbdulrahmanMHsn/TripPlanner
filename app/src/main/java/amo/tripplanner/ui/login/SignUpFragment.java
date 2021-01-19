@@ -67,8 +67,14 @@ public class SignUpFragment extends Fragment {
         String confirmPassword = binding.editConfirmPasswordSignUp.getText().toString();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            if (!email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty() &&(password.equals(confirmPassword))){
+            if (!email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty() &&(password.equals(confirmPassword)) &&
+                    android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                Toast.makeText(getContext(), "successful", Toast.LENGTH_SHORT).show();
                 FirebaseHelper.getInstance(getContext()).signUp(email, password, getContext(), view, R.id.action_signUpFragment_to_homeFragment);
+            }
+            else
+            {
+                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
             }
         }
     }

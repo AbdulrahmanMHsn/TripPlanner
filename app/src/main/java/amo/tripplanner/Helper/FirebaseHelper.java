@@ -13,9 +13,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -93,7 +96,13 @@ public class FirebaseHelper {
                         if (task.isSuccessful()) {
                             mUID = firebaseAuth.getCurrentUser().getUid();
                             mEmail = firebaseAuth.getCurrentUser().getEmail();
-                            Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
+                            if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
+                                Toast.makeText(context, "Not Verified Account", Toast.LENGTH_SHORT).show();
+                                firebaseAuth.signOut();
+                            }
+                            else{
+                                Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
+                            }
                         } else {
                             Toast.makeText(context, "failed", Toast.LENGTH_SHORT);
                         }
@@ -111,7 +120,24 @@ public class FirebaseHelper {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            final HashMap<String, String> map = new HashMap<>();
+                            // send email verification
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            user.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(context, "verify your account and login", Toast.LENGTH_SHORT).show();
+                                    Navigation.findNavController(view).navigate(R.id.action_signUpFragment_to_loginFragment);
+
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            });
+
+
+                           /* final HashMap<String, String> map = new HashMap<>();
                             map.put("email", email);
                             map.put("password", password);
                             FirebaseDatabase.getInstance().getReference("user")
@@ -125,7 +151,7 @@ public class FirebaseHelper {
                                                 Toast.makeText(context, "failed", Toast.LENGTH_SHORT);
                                             }
                                         }
-                                    });
+                                    });*/
                         }
                     }
                 });
