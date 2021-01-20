@@ -16,10 +16,6 @@ import amo.tripplanner.pojo.Trip;
 @Dao
 public interface TripDao {
 
-//    @Query("SELECT * FROM trip_table")
-//    LiveData<List<Trip>> getAllTrips();
-
-
     @Query("SELECT * FROM trip_table WHERE trip_status = 'Upcoming'")
     LiveData<List<Trip>> getAllTrips();
 
