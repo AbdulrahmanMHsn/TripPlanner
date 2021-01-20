@@ -1,5 +1,6 @@
 package amo.tripplanner.ui.login;
 
+import android.app.Dialog;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -22,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
 import java.util.Objects;
 
+import amo.tripplanner.Helper.Dialogs;
 import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.FragmentSignUpBinding;
@@ -32,6 +34,8 @@ public class SignUpFragment extends Fragment {
     private FragmentSignUpBinding binding;
     private FirebaseAuth auth;
     private View view;
+    private Dialog mProgress;
+
     public SignUpFragment() {
         // Required empty public constructor
     }
@@ -48,7 +52,7 @@ public class SignUpFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_sign_up, container, false);
-
+        mProgress = Dialogs.createProgressBarDialog(getContext(), "");
         view = container;
         binding.buttonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,19 +65,17 @@ public class SignUpFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private void register(){
+    private void register() {
         String email = binding.editEmailSignup.getText().toString();
         String password = binding.editPasswordSignUp.getText().toString();
         String confirmPassword = binding.editConfirmPasswordSignUp.getText().toString();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            if (!email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty() &&(password.equals(confirmPassword)) &&
-                    android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            if (!email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty() && (password.equals(confirmPassword)) &&
+                    android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length() > 6) {
                 Toast.makeText(getContext(), "successful", Toast.LENGTH_SHORT).show();
-                FirebaseHelper.getInstance(getContext()).signUp(email, password, getContext(), view, R.id.action_signUpFragment_to_homeFragment);
-            }
-            else
-            {
+                FirebaseHelper.getInstance(getContext()).signUp(email, password, getContext(), view, R.id.action_signUpFragment_to_homeFragment, mProgress);
+            } else {
                 Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
             }
         }

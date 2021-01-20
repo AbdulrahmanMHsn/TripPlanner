@@ -89,4 +89,7 @@ dependencies {
 
     implementation 'com.airbnb.android:lottie:3.4.4'
 
+    //Loading
+    implementation 'com.victor:lib:1.0.4'
+
 }

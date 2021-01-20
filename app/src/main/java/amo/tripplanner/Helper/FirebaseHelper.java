@@ -1,6 +1,7 @@
 package amo.tripplanner.Helper;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
@@ -42,6 +43,7 @@ public class FirebaseHelper {
     private FirebaseDatabase mDatabase;
 
     private DatabaseReference mDatabaseReference;
+
 
     private String mUID;
     private String mEmail;
@@ -86,8 +88,8 @@ public class FirebaseHelper {
 //    }
 
 
-    public void userLogin(String email, String password, final Context context, final View view) {
-
+    public void userLogin(String email, String password, final Context context, final View view, final Dialog mProgress) {
+        mProgress.show();
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
@@ -97,14 +99,16 @@ public class FirebaseHelper {
                             mUID = firebaseAuth.getCurrentUser().getUid();
                             mEmail = firebaseAuth.getCurrentUser().getEmail();
                             if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
+                                mProgress.dismiss();
                                 Toast.makeText(context, "Not Verified Account", Toast.LENGTH_SHORT).show();
                                 firebaseAuth.signOut();
-                            }
-                            else{
+                            } else {
+                                mProgress.dismiss();
                                 Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_homeFragment);
                             }
                         } else {
-                            Toast.makeText(context, "failed", Toast.LENGTH_SHORT);
+                            mProgress.dismiss();
+                            Toast.makeText(context, "failed", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -112,8 +116,8 @@ public class FirebaseHelper {
     }
 
 
-    public void signUp(final String email, final String password, final Context context, final View view, final int id) {
-
+    public void signUp(final String email, final String password, final Context context, final View view, final int id, final Dialog mProgress) {
+        mProgress.show();
         final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.createUserWithEmailAndPassword(email, password).
                 addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
@@ -125,6 +129,7 @@ public class FirebaseHelper {
                             user.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
+                                    mProgress.dismiss();
                                     Toast.makeText(context, "verify your account and login", Toast.LENGTH_SHORT).show();
                                     Navigation.findNavController(view).navigate(R.id.action_signUpFragment_to_loginFragment);
 
@@ -132,7 +137,8 @@ public class FirebaseHelper {
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-
+                                    mProgress.dismiss();
+                                    Toast.makeText(context, "failed", Toast.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -157,14 +163,14 @@ public class FirebaseHelper {
                 });
     }
 
-    public void logOut(){
+    public void logOut() {
         final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseAuth.signOut();
 
     }
 
 
-    public void syncWithBackend(List<Trip> trips,List<Trip> HistoryTrips) {
+    public void syncWithBackend(List<Trip> trips, List<Trip> HistoryTrips) {
 
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("user").child(getmUID()).child("trips");
 
@@ -204,7 +210,6 @@ public class FirebaseHelper {
     public String getCurrentUserEmail() {
         return Objects.requireNonNull(mAuth.getCurrentUser()).getEmail();
     }
-
 
 
 }

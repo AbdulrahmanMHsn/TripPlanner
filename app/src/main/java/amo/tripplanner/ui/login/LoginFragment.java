@@ -1,6 +1,7 @@
 package amo.tripplanner.ui.login;
 
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import amo.tripplanner.Helper.Dialogs;
 import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.FragmentLoginBinding;
@@ -41,6 +43,7 @@ public class LoginFragment extends Fragment {
     private static final int RC_SIGN_IN =1;
     private View view;
     private FragmentLoginBinding binding;
+    private Dialog mProgress;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -50,6 +53,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -57,7 +61,7 @@ public class LoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
-
+        mProgress = Dialogs.createProgressBarDialog(getContext(), "");
         onBackPressed();
 
 
@@ -149,7 +153,7 @@ public class LoginFragment extends Fragment {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             if (!email.isEmpty() && !password.isEmpty()) {
-                FirebaseHelper.getInstance(getContext()).userLogin(email, password, getContext(), view);
+                FirebaseHelper.getInstance(getContext()).userLogin(email, password, getContext(), view,mProgress);
             } else {
                 binding.layoutEmail.setBackgroundResource(R.drawable.background_input_empty);
                 binding.layoutPassword.setBackgroundResource(R.drawable.background_input_empty);

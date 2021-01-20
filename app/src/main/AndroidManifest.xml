@@ -21,7 +21,7 @@
         android:roundIcon="@mipmap/logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.DailogActivity" android:theme="@style/Theme.Transparent"/>
+        <activity android:name=".ui.DailogActivity" android:theme="@style/Theme.Transparent" android:launchMode="singleTop"/>
 <!--        <activity android:name=".ui.DailogActivity"/>-->
         <activity
             android:name=".ui.MainActivity"

@@ -1,12 +1,17 @@
 package amo.tripplanner.ui.home;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -45,6 +50,7 @@ import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.R;
@@ -149,7 +155,8 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 final Trip trip = adapter.getItem(position);
-                listViewModel.delete(trip);
+//                listViewModel.delete(trip);
+                openDialog(getContext(),trip);
             }
         });
         itemTouchHelper.attachToRecyclerView(historyBinding.idRecyclerView);
@@ -356,6 +363,42 @@ public class HistoryFragment extends Fragment implements OnMapReadyCallback, Map
     public void onLowMemory() {
         super.onLowMemory();
         historyBinding.mapView.onLowMemory();
+    }
+
+    public void openDialog(Context context, Trip trip) {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+        builder1.setTitle("Are you sure delete trip " + trip.getTripName() + " ? ");
+        builder1.setCancelable(false);
+        builder1.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                listViewModel.delete(trip);
+                adapter.setTrips(tripList);
+            }
+        });
+
+        builder1.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                adapter.setTrips(tripList);
+                dialog.cancel();
+            }
+        });
+
+
+        AlertDialog dialog = builder1.create();
+        if (dialog.getWindow() != null) {
+            int type;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                type = WindowManager.LayoutParams.TYPE_TOAST;
+            } else {
+                type = WindowManager.LayoutParams.TYPE_PHONE;
+            }
+            dialog.getWindow().setType(type);
+            Objects.requireNonNull(dialog.getWindow()).setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+            dialog.show();
+        }
     }
 
 

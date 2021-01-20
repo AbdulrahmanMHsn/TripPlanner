@@ -44,10 +44,13 @@ public class NotificationHelper extends ContextWrapper {
         return mManager;
     }
 
-    public NotificationCompat.Builder getChannelNotification(String msg) {
+    public NotificationCompat.Builder getChannelNotification(String msg,int idNotification) {
         Intent mainIntent = new Intent(context, DailogActivity.class);
-//        mainIntent.putExtra("idNotification",idNotification);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mainIntent.putExtra("idNotification",idNotification);
+        mainIntent.putExtra("msgNotification",msg);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, idNotification, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
                 .setContentTitle(msg)
                 .setContentText("Your waiting for trip "+msg)

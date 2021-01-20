@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
@@ -48,6 +49,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import amo.tripplanner.Helper.Dialogs;
 import amo.tripplanner.R;
 import amo.tripplanner.databinding.LayoutAddTripBinding;
 import amo.tripplanner.pojo.Location;
@@ -64,6 +66,7 @@ public class AddTripFragment extends Fragment {
     //vars
     public static final String TAG = "AddFragment";
     private boolean isStart;
+    private Dialog mProgress;
     private String[] repeats = {"No Repeat", "Repeat Daily", "Repeat Weekly","Repeat Monthly"};
     Calendar currentCalendar = Calendar.getInstance();
 
@@ -105,6 +108,8 @@ public class AddTripFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_add_trip, container, false);
 
         onBackPressed();
+
+        mProgress = Dialogs.createProgressBarDialog(getContext(), "");
 
         return binding.getRoot();
     }
@@ -156,7 +161,7 @@ public class AddTripFragment extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
             @Override
             public void onClick(View v) {
-
+                mProgress.show();
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(Calendar.YEAR, mYear);
                 calendar.set(Calendar.MONTH, mMonth);
@@ -277,6 +282,7 @@ public class AddTripFragment extends Fragment {
         TripListViewModel listViewModel = ViewModelProviders.of(this).get(TripListViewModel.class);
 //         listViewModel.insert(trip);
         listViewModel.insert(trip);
+        mProgress.dismiss();
 //         listViewModel.getId();
     }
 
@@ -293,7 +299,7 @@ public class AddTripFragment extends Fragment {
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), tripId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         if (tripRepeat.equals(repeats[0])) {
-            Toast.makeText(getContext(), "No repeat", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), "No repeat", Toast.LENGTH_SHORT).show();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timestamp, pendingIntent);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -304,7 +310,7 @@ public class AddTripFragment extends Fragment {
         }else{
 
             if(tripRepeat.equals(repeats[1])) {
-                Toast.makeText(getContext(), "repeat daily", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "repeat daily", Toast.LENGTH_SHORT).show();
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timestamp, AlarmManager.INTERVAL_DAY, pendingIntent);
 //                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -313,7 +319,7 @@ public class AddTripFragment extends Fragment {
 //                    alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timestamp, AlarmManager.INTERVAL_DAY, pendingIntent);
 //                }
             }else if(tripRepeat.equals(repeats[2])){
-                Toast.makeText(getContext(), "repeat weekly", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "repeat weekly", Toast.LENGTH_SHORT).show();
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timestamp, 7*AlarmManager.INTERVAL_DAY, pendingIntent);
 //                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -322,7 +328,7 @@ public class AddTripFragment extends Fragment {
 //                    alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, timestamp, 7*AlarmManager.INTERVAL_DAY, pendingIntent);
 //                }
             }else if(tripRepeat.equals(repeats[3])){
-                Toast.makeText(getContext(), "repeat monthly", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "repeat monthly", Toast.LENGTH_SHORT).show();
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timestamp, 30*AlarmManager.INTERVAL_DAY, pendingIntent);
 //                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -393,7 +399,6 @@ public class AddTripFragment extends Fragment {
 
             case "17":
                 return "05:" + time12;
-
             case "18":
                 return "06:" + time12;
             case "19":

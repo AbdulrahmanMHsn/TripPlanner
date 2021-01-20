@@ -1,5 +1,6 @@
 package amo.tripplanner.ui;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -20,6 +21,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -70,20 +72,33 @@ public class DailogActivity extends AppCompatActivity {
     private Trip trip = new Trip();
     private int tripId;
     private String tripName;
+    private int tripNotify;
     private String tripRepeat;
     private List<Note> noteList = new ArrayList<>();
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dailog);
+        if (getIntent() != null) {
+            tripId = getIntent().getIntExtra("TripID", 0);
+            tripNotify = getIntent().getIntExtra("idNotification", 0);
+            tripName = getIntent().getStringExtra("TripName");
+        }else{
+            startActivity(new Intent(this,MainActivity.class));
+            finish();
+        }
 
+        if (tripName == null) {
+            tripName = getIntent().getStringExtra("msgNotification");
+        }
+//        Toast.makeText(this, ""+getIntent().getIntExtra("idNotification",0), Toast.LENGTH_SHORT).show();
 
-        tripId = getIntent().getIntExtra("TripID", 0);
-        tripName = getIntent().getStringExtra("TripName");
-
-        if (tripId == 0) {
-            getDataFromSharedPreference();
+        if (tripNotify != 0) {
+            tripId = tripNotify;
+//            Toast.makeText(this, "tripId: "+tripId, Toast.LENGTH_SHORT).show();
+//            getDataFromSharedPreference();
         }
 
 
@@ -93,7 +108,7 @@ public class DailogActivity extends AppCompatActivity {
 
             listViewModels.getTripById(tripId).observe(this, trips -> {
                 trip = trips;
-//                tripRepeat = trip.getTripRepeat();
+//                tripName = trip.getTripName();
 
             });
             openDialog(getApplicationContext());
@@ -101,8 +116,9 @@ public class DailogActivity extends AppCompatActivity {
             listViewModels.getNoteById(tripId).observe(this, trip -> {
                 noteList = trip.getTripNotes();
             });
-            saveOnSharedPreference();
 
+
+//            saveOnSharedPreference();
         }
 
     }
@@ -123,9 +139,10 @@ public class DailogActivity extends AppCompatActivity {
 //        tripRepeat = preferences.getString("TripRepeat", "TripRepeat");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("ObsoleteSdkInt")
     public void openDialog(Context context) {
-
+        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
         builder1.setTitle(tripName);
         builder1.setMessage("It's time for your  trip " + tripName);
@@ -160,10 +177,18 @@ public class DailogActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
 //                if (tripRepeat.equals("No Repeat")) {
                 listViewModels.update(tripId, "Cancel");
+
                 NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancel(tripId);
-//                }
+
+                Intent intent = new Intent(DailogActivity.this,MainActivity.class);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+
                 dialog.cancel();
+
             }
         });
 
@@ -172,8 +197,9 @@ public class DailogActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 NotificationHelper notificationHelper = new NotificationHelper(context);
-                NotificationCompat.Builder nb = notificationHelper.getChannelNotification(tripName);
+                NotificationCompat.Builder nb = notificationHelper.getChannelNotification(tripName, tripId);
                 notificationHelper.getManager().notify(tripId, nb.build());
+                finish();
             }
         });
 
@@ -191,4 +217,9 @@ public class DailogActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Toast.makeText(this, "get", Toast.LENGTH_SHORT).show();
+    }
 }
