@@ -172,36 +172,42 @@ public class AddTripFragment extends Fragment {
                 timestamp = calendar.getTimeInMillis();
 
                 if (binding.addTripEdTxtVwTripName.getText().toString().isEmpty()) {
+                    mProgress.cancel();
                     binding.addTripEdTxtVwTripName.setBackgroundResource(R.drawable.background_input_empty);
                     binding.addTripEdTxtVwTripName.setError(getString(R.string.name_required));
                     return;
                 }
 
                 if (binding.addTripEdTxtVwTripStartPoint.getText().toString().isEmpty()) {
+                    mProgress.cancel();
                     binding.addTripEdTxtVwTripStartPoint.setBackgroundResource(R.drawable.background_input_empty);
                     binding.addTripEdTxtVwTripStartPoint.setError(getString(R.string.startPoint_required));
                     return;
                 }
 
                 if (binding.addTripEdTxtVwTripEndPoint.getText().toString().isEmpty()) {
+                    mProgress.cancel();
                     binding.addTripEdTxtVwTripEndPoint.setBackgroundResource(R.drawable.background_input_empty);
                     binding.addTripEdTxtVwTripEndPoint.setError(getString(R.string.endPoint_required));
                     return;
                 }
 
                 if (binding.addTripEdTxtVwTripDate.getText().toString().isEmpty()) {
+                    mProgress.cancel();
                     binding.addTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);
                     binding.addTripEdTxtVwTripDate.setError(getString(R.string.date_required));
                     return;
                 }
 
                 if (binding.addTripEdTxtVwTripTime.getText().toString().isEmpty()) {
+                    mProgress.cancel();
                     binding.addTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);
                     binding.addTripEdTxtVwTripTime.setError(getString(R.string.time_required));
                     return;
                 }
 
                 if (timestamp < currentCalendar.getTimeInMillis()) {
+                    mProgress.cancel();
                     binding.addTripEdTxtVwTripDate.setBackgroundResource(R.drawable.background_input_empty);
                     binding.addTripEdTxtVwTripTime.setBackgroundResource(R.drawable.background_input_empty);
                     binding.addTripEdTxtVwTripTime.setError(getString(R.string.time_expired));

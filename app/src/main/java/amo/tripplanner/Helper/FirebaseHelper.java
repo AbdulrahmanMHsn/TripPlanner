@@ -170,8 +170,8 @@ public class FirebaseHelper {
     }
 
 
-    public void syncWithBackend(List<Trip> trips, List<Trip> HistoryTrips) {
-
+    public void syncWithBackend(List<Trip> trips, List<Trip> HistoryTrips  ,  Dialog mProgress) {
+        mProgress.show();
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("user").child(getmUID()).child("trips");
 
         rootRef.setValue(trips).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -180,6 +180,10 @@ public class FirebaseHelper {
 
                 if (!task.isSuccessful()) {
                     Log.i(TAG, "onComplete: failed");
+                    mProgress.cancel();
+                }else
+                {
+                    mProgress.cancel();
                 }
 
             }
@@ -194,6 +198,10 @@ public class FirebaseHelper {
 
                 if (!task.isSuccessful()) {
                     Log.i(TAG, "onComplete: failed");
+                    mProgress.cancel();
+                }else
+                {
+                    mProgress.cancel();
                 }
 
             }

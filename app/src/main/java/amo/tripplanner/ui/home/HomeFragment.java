@@ -3,6 +3,7 @@ package amo.tripplanner.ui.home;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import amo.tripplanner.Helper.Dialogs;
 import amo.tripplanner.Helper.FirebaseHelper;
 import amo.tripplanner.Helper.NotificationHelper;
 import amo.tripplanner.R;
@@ -64,7 +66,7 @@ public class HomeFragment extends Fragment {
 
 
     private FragmentHomeBinding bindingHome;
-
+    private Dialog mProgress;
     private TripListAdapter adapter;
 
     private TripListViewModel listViewModel;
@@ -92,7 +94,7 @@ public class HomeFragment extends Fragment {
 
         onBackPressed();
 
-
+        mProgress = Dialogs.createProgressBarDialog(getContext(), "");
         drawerLayout = bindingHome.drawerLayout;
 
         View viewHeader = bindingHome.navView.getHeaderView(0);
@@ -179,7 +181,8 @@ public class HomeFragment extends Fragment {
         bindingHome.navView.getMenu().getItem(2).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                FirebaseHelper.getInstance(getContext()).syncWithBackend(tripList, tripListHistory);
+
+                FirebaseHelper.getInstance(getContext()).syncWithBackend(tripList, tripListHistory,mProgress);
 //                FirebaseHelper.getInstance(getContext()).syncWithBackend(tripListHistory);
                 return false;
             }
