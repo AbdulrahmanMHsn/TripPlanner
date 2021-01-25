@@ -302,6 +302,8 @@ public class AddTripFragment extends Fragment {
         intent.putExtra("TripID", tripId);
         intent.putExtra("TripName", tripName);
 
+        final int idAlarm = (int) System.currentTimeMillis();
+
         final PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), tripId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         if (tripRepeat.equals(repeats[0])) {
